@@ -1,62 +1,124 @@
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #f4f7f9;
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+
+:root {
+  --bg-gray: #e0e0e2; 
+  --color-low: #9B9AC4;
+  --color-mid: #6D62AA;
+  --color-high: #10023D;
 }
 
-#popup-container {
-  width: 350px; /* 팝업 전용 너비 */
-  height: 400px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+body { 
+  width: 350px; height: 500px; background-color: #faeeee; 
+  display: flex; justify-content: center; align-items: center; 
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+.container { 
+  width: 350px; height: 500px; background: #ffffff; 
+  position: relative; overflow: hidden;
 }
 
-.logo {
-  font-size: 1.2rem;
-  color: #004B9B;
-  margin: 0;
+/* 페이지 전환 공통 */
+.page-view {
+  position: absolute; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; visibility: hidden;
+  transition: all 0.4s ease-in-out;
+}
+.page-view.active { opacity: 1; visibility: visible; }
+
+/* [OFF 페이지] 가이드 좌표 정밀 반영 */
+.center-layout { width: 100%; height: 100%; position: relative; }
+
+/* 1. 메인 로고: x 116, y 84 / w 119, h 124 */
+.logo-main { 
+  width: 133px; height: 133px; 
+  position: absolute; left: 123px; top: 84px; 
 }
 
-.status-badge {
-  font-size: 11px;
-  background: #dcfce7;
-  color: #15803d;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: bold;
+/* 2. 다크 패턴 분석 제목: x 79, y 241 / w 192, h 34 / 32px */
+.title { 
+  font-size: 32px; font-weight: 800; color: #000;
+  position: absolute; left: 79px; top: 241px;
+  width: 192px; height: 34px; text-align: center;
 }
 
-.count-box {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  margin-bottom: 15px;
+/* 3. 설명 및 하단 요소: 제목 아래로 순차 배치 */
+.description { 
+  font-size: 14px; color: #888; line-height: 1.4;
+  position: absolute; width: 100%; left: 0; top: 285px; text-align: center; 
+}
+.status-text { 
+  font-size: 12px; color: #bbb; 
+  position: absolute; width: 100%; left: 0; top: 345px; text-align: center; 
+}
+.center-layout .toggle-btn { 
+  position: absolute; left: 130px; top: 375px; 
 }
 
-.count-box strong {
-  display: block;
-  font-size: 3rem;
-  color: #004B9B;
+/* [ON 페이지] 구성 요소 겹침 방지 */
+.top-header { 
+  width: 100%; display: flex; justify-content: space-between; 
+  align-items: center; padding: 20px 25px; margin-bottom: 0; 
+}
+.logo-mini { width: 45px; height: auto; }
+
+.title-mini { 
+  font-size: 28px; font-weight: 800; color: #000;
+  text-align: center; margin-top: -10px; margin-bottom: 20px;
 }
 
-#test-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background: #004B9B;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+/* 도넛 그래프 영역 */
+.chart-container { 
+  position: relative; width: 200px; height: 200px; margin-bottom: 30px; 
 }
+.donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+circle { fill: none; stroke-width: 32; }
+.chart-bg { stroke: var(--bg-gray); } 
+
+.meter {
+  stroke-dasharray: 73.3 219.9; opacity: 0;
+  transition: opacity 0.3s ease; stroke-linecap: butt;
+}
+.meter.active { opacity: 1; }
+.meter.low { stroke: var(--color-low); stroke-dashoffset: 0; }
+.meter.mid { stroke: var(--color-mid); stroke-dashoffset: -73.3; }
+.meter.high { stroke: var(--color-high); stroke-dashoffset: -146.6; }
+
+/* 도넛 내부 라벨 정렬 */
+.labels-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.guide-label {
+  position: absolute; font-size: 13px; font-weight: 800; color: #FFFFFF;
+  text-shadow: 0 0 4px rgba(0,0,0,0.3); white-space: nowrap; opacity: 0.4; 
+  transform: translate(-50%, -50%); 
+}
+.guide-label.low { top: 32%; left: 78%; } 
+.guide-label.high { top: 32%; left: 22%; } 
+.guide-label.mid { top: 80%; left: 50%; } 
+.guide-label.active { opacity: 1; font-weight: 900; transform: translate(-50%, -50%) scale(1.1); }
+
+/* 하단 위험도 텍스트 */
+.risk-title { 
+  font-size: 24px; font-weight: 800; color: #000; 
+  text-align: center; margin-top: auto; padding-bottom: 40px; 
+}
+
+/* 토글 기본 스타일 (통합) */
+.toggle-btn { position: relative; width: 90px; height: 40px; display: inline-block; cursor: pointer; }
+.toggle-btn input { opacity: 0; width: 0; height: 0; }
+.slider, .slider-on {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #DEDEDE; border-radius: 40px; transition: 0.3s;
+  display: flex; align-items: center;
+}
+.slider { justify-content: flex-end; padding-right: 15px; }
+.slider-on { background-color: var(--color-high); justify-content: flex-start; padding-left: 10px; }
+.slider:before, .slider-on:before { 
+  position: absolute; content: ""; height: 32px; width: 32px; border-radius: 50%; background-color: white; transition: 0.3s; 
+}
+.slider:before { left: 4px; }
+.slider-on:before { right: 4px; }
+input:checked + .slider { background-color: var(--color-high); }
+input:checked + .slider:before { transform: translateX(50px); }
+.label-text { color: white; font-size: 11px; font-weight: 900; z-index: 1; pointer-events: none; }
