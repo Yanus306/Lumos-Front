@@ -1,11 +1,10 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+/* 기본 초기화 */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
 
 :root {
   --bg-gray: #e0e0e2; 
-  --color-low: #9B9AC4;
-  --color-mid: #6D62AA;
   --color-high: #10023D;
 }
 
@@ -14,60 +13,135 @@ body {
   display: flex; justify-content: center; align-items: center; 
 }
 
+/* 컨테이너 패딩 제거하여 절대 좌표 활성화 */
 .container { 
   width: 350px; height: 500px; background: #ffffff; 
   position: relative; overflow: hidden;
 }
 
-/* 페이지 전환 공통 */
 .page-view {
   position: absolute; width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: center;
   opacity: 0; visibility: hidden;
   transition: all 0.4s ease-in-out;
 }
 .page-view.active { opacity: 1; visibility: visible; }
 
-/* [OFF 페이지] 가이드 좌표 정밀 반영 */
+/* [OFF 페이지] 가이드 정밀 좌표 반영 */
 .center-layout { width: 100%; height: 100%; position: relative; }
 
-/* 1. 메인 로고: x 116, y 84 / w 119, h 124 */
+/* 1. 로고 */
 .logo-main { 
-  width: 133px; height: 133px; 
-  position: absolute; left: 123px; top: 84px; 
+  position: absolute;
+  left: 108px; top: 84px; 
+  width: 150px; height: 150px;
 }
 
-/* 2. 다크 패턴 분석 제목: x 79, y 241 / w 192, h 34 / 32px */
+/* 2. 다크 패턴 분석 제목: x 87, y 241 / w 177, h 38 */
 .title { 
-  font-size: 32px; font-weight: 800; color: #000;
-  position: absolute; left: 79px; top: 241px;
-  width: 192px; height: 34px; text-align: center;
+  position: absolute;
+  left: 87px; 
+  top: 241px;
+  width: 177px; 
+  height: 38px;
+  font-size: 32px; 
+  font-weight: 600; /* SemiBold */
+  color: #383838;
+  text-align: center;
+  line-height: 38px;
+  letter-spacing: -0.02em; /* 자간 -2% */
 }
 
-/* 3. 설명 및 하단 요소: 제목 아래로 순차 배치 */
+/* 3. 설명 문구 */
 .description { 
-  font-size: 14px; color: #888; line-height: 1.4;
-  position: absolute; width: 100%; left: 0; top: 285px; text-align: center; 
+  position: absolute;
+  left: 73px; 
+  top: 289px;
+  width: 204px; 
+  height: 42px;
+  font-size: 18px; 
+  font-weight:400; 
+  color: #919191; 
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: -0.02em; /* 자간 -2% */
 }
+
+/* 4. 보호가 비활성화됨: x 129, y 350 / w 93, h 13 */
 .status-text { 
-  font-size: 12px; color: #bbb; 
-  position: absolute; width: 100%; left: 0; top: 345px; text-align: center; 
+  position: absolute;
+  left: 125px; 
+  top: 350px;
+  width: 100px; 
+  height: 14px;
+  font-size: 12px; 
+  color: #919191; 
+  text-align: center;
 }
+
+/* 5. 토글 큰 원(배경) */
 .center-layout .toggle-btn { 
-  position: absolute; left: 130px; top: 375px; 
+  position: absolute;
+  left: 117px; 
+  top: 371px;
+  width: 116.6px; 
+  height: 45.43px;
 }
 
-/* [ON 페이지] 구성 요소 겹침 방지 */
-.top-header { 
-  width: 100%; display: flex; justify-content: space-between; 
-  align-items: center; padding: 20px 25px; margin-bottom: 0; 
+/* 6. 토글 안 흰색 원 (OFF 상태): 가이드 X: 126.09, Y: 375.54 반영 */
+/* 계산: x(126.09 - 117) = 9.09px, y(375.54 - 371) = 4.54px */
+.center-layout .slider:before { 
+  position: absolute;
+  left: 9.09px; /* 왼쪽 배치 */
+  top: 4.54px; 
+  width: 34.83px; 
+  height: 34.83px; 
+  content: "";
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25); /* 가이드의 바깥쪽 그림자 반영 */
+  transition: 0.3s;
+  z-index: 2;
 }
-.logo-mini { width: 45px; height: auto; }
 
-.title-mini { 
-  font-size: 28px; font-weight: 800; color: #000;
-  text-align: center; margin-top: -10px; margin-bottom: 20px;
+/* 7. 토글 안 OFF 글씨 (OFF 상태): 가이드 기반 오른쪽 배치 */
+.center-layout .label-text { 
+  position: absolute;
+  left: 65.29px; /* 오른쪽 배치 */
+  top: 14.66px; 
+  width: 30px; 
+  height: 19px;
+  font-size: 16px;
+  font-weight: 350;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
+
+input:checked + .slider .label-text {
+  opacity: 0;
+}
+/* 토글 클릭 시 ON 상태로 이동 설정 */
+/* ON일 때의 원 위치(X: 192) 기준: 192 - 117 = 75px */
+input:checked + .slider:before { 
+  transform: translateX(65.91px) !important; /* 75px - 9.09px 이동 */
+}
+
+/* 토글 작동 시 색상 변경 */
+input:checked + .slider { background-color: var(--color-high); }
+
+/* [ON 페이지] 정렬 최적화 */
+.top-header { width: 100%; display: flex; justify-content: space-between; padding: 20px 25px; align-items: center; }
+.logo-mini { width: 45px; }
+.title-mini { font-size: 28px; font-weight: 800; text-align: center; margin-top: 20px; color: #000; }
+
+.chart-container { position: relative; width: 220px; height: 220px; margin: 30px auto; }
+.risk-title { font-size: 24px; font-weight: 800; text-align: center; margin-top: 40px; color: #000; }
 
 /* 도넛 그래프 영역 */
 .chart-container { 

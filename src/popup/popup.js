@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("토글 켜짐!"); // 작동 확인용
         if (statusMsg) { 
           statusMsg.textContent = "보호가 활성화됨"; 
-          statusMsg.style.color = "#000000"; 
+          statusMsg.style.color = "#919191"; 
         }
         
         // 1. 현재 화면 살짝 내리면서 사라지게
