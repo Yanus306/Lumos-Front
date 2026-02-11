@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-  
   const toOnBtn = document.getElementById('to-on-btn');
   const toOffBtn = document.getElementById('to-off-btn');
   const viewOff = document.getElementById('view-off');
   const viewOn = document.getElementById('view-on');
-  const statusMsg = document.getElementById('status-msg'); 
+  const statusMsg = document.getElementById('status-msg');
+  const labelText = document.querySelector('.center-layout .label-text'); // OFF/ON 글자
 
   const levels = ['low', 'mid', 'high'];
 
@@ -35,23 +35,31 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        console.log("토글 켜짐!"); // 작동 확인용
+        // 1. 상태 메시지 즉시 변경
         if (statusMsg) { 
           statusMsg.textContent = "보호가 활성화됨"; 
-          statusMsg.style.color = "#919191"; 
+          statusMsg.style.color = "#383838"; 
+        }
+
+        // 2. 토글 내부 글자 변경 및 위치 이동 (원의 반대편으로)
+        if (labelText) {
+          labelText.style.opacity = '0'; // 잠시 숨김
+          setTimeout(() => {
+            labelText.textContent = "ON";
+            labelText.style.left = "25px"; // 원이 우측으로 갔으니 글자는 좌측으로
+            labelText.style.opacity = '1';
+          }, 200);
         }
         
-        // 1. 현재 화면 살짝 내리면서 사라지게
-        viewOff.classList.remove('active');
-        
+        // 3. 토글 애니메이션(0.4초)을 충분히 보여준 뒤 화면 전환
         setTimeout(() => {
-          // 2. 다음 화면 나타나게
-          viewOn.classList.add('active');
-          // 3. 상단 미니 토글도 ON 상태로 동기화
-          if (toOffBtn) toOffBtn.checked = true;
-          // 4. 분석 게이지 작동
-          setTimeout(() => updateRisk('high'), 400); 
-        }, 300);
+          viewOff.classList.remove('active');
+          setTimeout(() => {
+            viewOn.classList.add('active');
+            if (toOffBtn) toOffBtn.checked = true;
+            setTimeout(() => updateRisk('high'), 400); 
+          }, 300);
+        }, 500); // 0.5초 대기 (토글 이동 감상 시간)
       }
     });
   }
@@ -60,12 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toOffBtn) {
     toOffBtn.addEventListener('change', function() {
       if (!this.checked) {
-        console.log("토글 꺼짐!"); // 작동 확인용
         viewOn.classList.remove('active');
         
         setTimeout(() => {
           viewOff.classList.add('active');
           if (toOnBtn) toOnBtn.checked = false;
+          
+          // 글자 및 상태 메시지 원복
+          if (labelText) {
+            labelText.textContent = "OFF";
+            labelText.style.left = "65.29px";
+          }
           if (statusMsg) { 
             statusMsg.textContent = "보호가 비활성화됨"; 
             statusMsg.style.color = "#bbb"; 
