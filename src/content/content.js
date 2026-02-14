@@ -1,22 +1,70 @@
-// src/content/content.js
+import mainLogoSrc from "../assets/main-logo.svg";
+
+// 이미지 로고
+const mainLogoElement = document.querySelector('#main-logo');
+if (mainLogoElement) mainLogoElement.src = mainLogoSrc;
 
 const injectModal = () => {
   const modalContainer = document.createElement('div');
   modalContainer.id = 'lumos-injected-modal';
   
-  // 1번 단계에서 완성한 HTML을 그대로 복사해서 넣기
+  const logoUrl = chrome.runtime.getURL("assets/main-logo.svg");
+
   modalContainer.innerHTML = `
-    <div class="lumos-overlay">
-      <div class="lumos-box">
-        <img src="${chrome.runtime.getURL('assets/text-logo.svg')}" class="modal-logo">
-        <h2>다크 패턴 감지!</h2>
-        <p>이 사이트에서 사용자를 기만하는 디자인이 발견되었습니다.</p>
-        <button id="close-modal">확인</button>
-      </div>
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <img src="${logoUrl}" alt="로고" class="modal-logo">
+            <div class="modal-content-box">
+                <div class="modal-title">개인정보 처리방침</div>
+                <div class="modal-content-container">
+                    Cupidatat labore velit...
+                </div>
+                <label class="modal-checkbox">
+                    <input type="checkbox" name="agree-privacy">
+                    <span class="checkbox-mark"></span>
+                    <span class="checkbox-text">동의합니다</span>
+                </label>
+            </div>
+            <div class="modal-content-box">
+                <div class="modal-title">이용약관</div>
+                <div class="modal-content-container">
+                    Esse deserunt ut velit...
+                </div>
+                <label class="modal-checkbox">
+                    <input type="checkbox" name="agree-terms">
+                    <span class="checkbox-mark"></span>
+                    <span class="checkbox-text">동의합니다</span>
+                </label>
+            </div>
+        </div>
     </div>
   `;
   
   document.body.appendChild(modalContainer);
+
+  // 주입된 후 체크박스 로직 설정
+  setupCheckboxLogic(modalContainer);
+};
+
+// 체크박스 감지 및 자동 닫기 로직
+const setupCheckboxLogic = (container) => {
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    const modalOverlay = container.querySelector('.modal-overlay');
+
+    const handleCheck = () => {
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        if (allChecked) {
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+                // 아예 DOM에서 제거하고 싶다면 아래 주석 해제
+                // container.remove(); 
+            }, 300);
+        }
+    };
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', handleCheck);
+    });
 };
 
 injectModal();
