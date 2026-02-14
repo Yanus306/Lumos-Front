@@ -1,14 +1,15 @@
 /* 모달 배경 (어둡게) */
 .modal-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7); /* 배경 어둡기 조절 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 2147483647 !important; 
 }
 
 /* 모달 박스 */
@@ -21,7 +22,8 @@
     justify-content: center;
     align-items: center;
 
-    background-color: white;
+    background-color: white !important;
+    z-index: 2147483648 !important;
     border-radius: 20px;
 }
 

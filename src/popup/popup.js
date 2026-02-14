@@ -64,11 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        // 스토리지에 ON 상태 저장 -> content.js가 감지해서 모달 띄움
-        chrome.storage.local.set({ lumosDetectEnabled: true });
+        // 확실하게 값을 저장하고 콜백으로 확인
+        chrome.storage.local.set({ "lumosDetectEnabled": true }, () => {
+          console.log("✅ 저장소에 true 저장 완료");
+        });
         
-        // 일단 체크를 해제해 둡니다. (모달이 닫힌 후에 실제로 ON 애니메이션을 보여주기 위해)
-        this.checked = false;
+        // 모달이 뜨는 동안 버튼이 체크 상태로 남지 않게 하려면 아래 유지
+        this.checked = false; 
       }
     });
   }

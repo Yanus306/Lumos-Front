@@ -1,24 +1,48 @@
-console.log("Lumos Content Script Loaded - Checking Storage...");
+console.error("🚨🚨🚨 LUMOS IS ALIVE! 🚨🚨🚨"); 
+console.log("Lumos 주입 성공!");
 
 import "../../src/common.css";
 import "../content/content.css";
 import mainLogoSrc from "../assets/main-logo.svg";
 
-// 페이지 로드 시 현재 설정 상태 확인
+/* 초기화 함수 */
+const initLumos = () => {
+    chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+        // 결과값이 undefined이거나 null인 경우를 대비한 방어 코드
+        const isEnabled = result && result.lumosDetectEnabled;
+        console.log("Current Storage Status:", isEnabled);
+        
+        if (isEnabled === true) {
+            injectModal();
+        }
+    });
+};
+
+// 페이지 로드 상태 확인 후 실행
+if (document.readyState === 'complete') {
+    initLumos();
+} else {
+    window.addEventListener('load', initLumos);
+}
+
+/*// 페이지 로드 시 현재 설정 상태 확인
 chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
     console.log("Current Storage Status:", result.lumosDetectEnabled);
     if (result.lumosDetectEnabled) {
         injectModal();
     }
-});
+});*/
 
-// 스토리지 값이 변경될 때 버튼 On/Off 실시간 감지
+// 스토리지 변경 감지
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.lumosDetectEnabled) {
-        const isEnabled = changes.lumosDetectEnabled.newValue;
+
+        const newValue = changes.lumosDetectEnabled.newValue;
+        const isEnabled = typeof newValue === 'object' ? newValue.enabled : newValue;
+        
         console.log("Storage Changed. New Value:", isEnabled);
         
-        if (isEnabled) {
+        if (isEnabled === true) {
             if (!document.querySelector('#lumos-injected-modal')) {
                 injectModal();
             }
@@ -31,6 +55,8 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 /* 모달 주입 함수 */
 const injectModal = () => {
+    if (document.querySelector('#lumos-injected-modal')) return;
+    
     console.log("Injecting Modal into Body...");
     const modalContainer = document.createElement('div');
     modalContainer.id = 'lumos-injected-modal';
