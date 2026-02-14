@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewOff = document.getElementById('view-off');
   const viewOn = document.getElementById('view-on');
   const statusMsg = document.getElementById('status-msg');
-  const labelText = document.querySelector('.center-layout .label-text'); // OFF/ON 글자
+  const labelText = document.querySelector('.center-layout .label-text');
 
   const levels = ['low', 'mid', 'high'];
 
@@ -31,50 +31,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // OFF -> ON 토글 클릭 이벤트
+  // --- 핵심: 모달이 닫혔을 때 실행될 화면 전환 함수 ---
+  function proceedToOnView() {
+    // 1. 상태 메시지 즉시 변경
+    if (statusMsg) { 
+      statusMsg.textContent = "보호가 활성화됨"; 
+      statusMsg.style.color = "#383838"; 
+    }
+
+    // 2. 토글 내부 글자 변경 애니메이션
+    if (labelText) {
+      labelText.style.opacity = '0';
+      setTimeout(() => {
+        labelText.textContent = "ON";
+        labelText.style.left = "25px";
+        labelText.style.opacity = '1';
+      }, 200);
+    }
+    
+    // 3. 화면 전환
+    setTimeout(() => {
+      viewOff.classList.remove('active');
+      setTimeout(() => {
+        viewOn.classList.add('active');
+        if (toOffBtn) toOffBtn.checked = true;
+        setTimeout(() => updateRisk('high'), 400); 
+      }, 300);
+    }, 500);
+  }
+
+  // --- 1. OFF -> ON 토글 클릭 (모달 띄우기 신호만 보냄) ---
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        // 1. 상태 메시지 즉시 변경
-        if (statusMsg) { 
-          statusMsg.textContent = "보호가 활성화됨"; 
-          statusMsg.style.color = "#383838"; 
-        }
-
-        // 2. 토글 내부 글자 변경 및 위치 이동 (원의 반대편으로)
-        if (labelText) {
-          labelText.style.opacity = '0'; // 잠시 숨김
-          setTimeout(() => {
-            labelText.textContent = "ON";
-            labelText.style.left = "25px"; // 원이 우측으로 갔으니 글자는 좌측으로
-            labelText.style.opacity = '1';
-          }, 200);
-        }
+        // 스토리지에 ON 상태 저장 -> content.js가 감지해서 모달 띄움
+        chrome.storage.local.set({ lumosDetectEnabled: true });
         
-        // 3. 토글 애니메이션(0.4초)을 충분히 보여준 뒤 화면 전환
-        setTimeout(() => {
-          viewOff.classList.remove('active');
-          setTimeout(() => {
-            viewOn.classList.add('active');
-            if (toOffBtn) toOffBtn.checked = true;
-            setTimeout(() => updateRisk('high'), 400); 
-          }, 300);
-        }, 500); // 0.5초 대기 (토글 이동 감상 시간)
+        // 일단 체크를 해제해 둡니다. (모달이 닫힌 후에 실제로 ON 애니메이션을 보여주기 위해)
+        this.checked = false;
       }
     });
   }
 
-  // ON -> OFF 토글 클릭 이벤트
+  // --- 2. 스토리지 감시 (모달이 다 닫혔는지 확인) ---
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes.lumosDetectEnabled) {
+      const isEnabled = changes.lumosDetectEnabled.newValue;
+      
+      // 모달 내 체크박스가 다 눌려서 content.js가 hidden 처리를 하고 
+      // 만약 스토리지 상태를 변경한다면 여기서 감지하여 proceedToOnView() 실행
+      // (지금 로직상으로는 모달이 떴다는 것 자체가 이미 On 신호이므로, 
+      //  별도의 '완료' 신호를 추가하면 더 완벽합니다.)
+      
+      // 테스트용: 버튼 누르면 바로 실행되게 하려면 위 1번에서 바로 실행하거나, 
+      // 완료 신호를 따로 만드세요.
+    }
+  });
+
+  // --- 3. ON -> OFF 토글 클릭 ---
   if (toOffBtn) {
     toOffBtn.addEventListener('change', function() {
       if (!this.checked) {
+        chrome.storage.local.set({ lumosDetectEnabled: false });
         viewOn.classList.remove('active');
         
         setTimeout(() => {
           viewOff.classList.add('active');
           if (toOnBtn) toOnBtn.checked = false;
-          
-          // 글자 및 상태 메시지 원복
           if (labelText) {
             labelText.textContent = "OFF";
             labelText.style.left = "65.29px";
@@ -88,4 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  chrome.runtime.onMessage.addListener((request) => {
+      if (request.action === "MODAL_COMPLETE") {
+          // 모달이 닫혔으니 이제 팝업 버튼을 ON으로 옮기고 다음 페이지로!
+          if (toOnBtn) toOnBtn.checked = true;
+          proceedToOnView();
+      }
+  });
 });
