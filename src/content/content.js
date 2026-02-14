@@ -1,12 +1,12 @@
-import "./content.css";
-import mainLogoSrc from "../assets/main-logo.svg";
+console.log("Lumos Content Script Loaded - Checking Storage...");
 
-// 이미지 로고
-const mainLogoElement = document.querySelector('#main-logo');
-if (mainLogoElement) mainLogoElement.src = mainLogoSrc;
+import "../../src/common.css";
+import "../content/content.css";
+import mainLogoSrc from "../assets/main-logo.svg";
 
 // 페이지 로드 시 현재 설정 상태 확인
 chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+    console.log("Current Storage Status:", result.lumosDetectEnabled);
     if (result.lumosDetectEnabled) {
         injectModal();
     }
@@ -16,14 +16,13 @@ chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.lumosDetectEnabled) {
         const isEnabled = changes.lumosDetectEnabled.newValue;
+        console.log("Storage Changed. New Value:", isEnabled);
         
         if (isEnabled) {
-            // 버튼 On 시 모달 없으면 생성
             if (!document.querySelector('#lumos-injected-modal')) {
                 injectModal();
             }
         } else {
-            // 버튼 Off 시 모달 제거
             const existingModal = document.querySelector('#lumos-injected-modal');
             if (existingModal) existingModal.remove();
         }
@@ -32,23 +31,25 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 /* 모달 주입 함수 */
 const injectModal = () => {
+    console.log("Injecting Modal into Body...");
     const modalContainer = document.createElement('div');
     modalContainer.id = 'lumos-injected-modal';
     
-    // 확장 프로그램 내의 리소스 주소를 웹 페이지에서 쓸 수 있는 URL로 변환합니다.
+    // 확장 프로그램 내의 리소스 주소 URL로 변환
     const logoUrl = chrome.runtime.getURL("assets/main-logo.svg");
 
     modalContainer.innerHTML = `
         <div class="modal-overlay">
             <div class="modal-container">
-                <img src="${logoUrl}" alt="로고" class="modal-logo">
+                <img id="main-logo" src="${logoUrl}" alt="로고" class="modal-logo">
                 
                 <div class="modal-content-box">
                     <div class="modal-title">개인정보 처리방침</div>
                     <div class="modal-content-container">
                         Cupidatat labore velit in magna elit cillum sint id sit labore ipsum cupidatat minim consectetur. 
                         Est elit sunt irure in sint labore ut proident eiusmod cillum officia duis.
-                        (중략...)
+                        Fugiat pariatur ipsum nisi est nulla adipisicing excepteur.
+                        Esse deserunt ut velit incididunt eiusmod duis aute duis enim. Sunt culpa exercitation commodo ipsum est sunt laborum. Cillum aliquip velit nisi deserunt minim. Lorem eu ad pariatur consectetur et sit deserunt eiusmod et.
                     </div>
                     <label class="modal-checkbox">
                         <input type="checkbox" name="agree-privacy">
@@ -62,7 +63,8 @@ const injectModal = () => {
                     <div class="modal-content-container">
                         Esse deserunt ut velit incididunt eiusmod duis aute duis enim. 
                         Sunt culpa exercitation commodo ipsum est sunt laborum.
-                        (중략...)
+                        Cillum aliquip velit nisi deserunt minim. Lorem eu ad pariatur consectetur et sit deserunt eiusmod et.
+                        Cupidatat labore velit in magna elit cillum sint id sit labore ipsum cupidatat minim consectetur. Est elit sunt irure in sint labore ut proident eiusmod cillum officia duis. Fugiat pariatur ipsum nisi est nulla adipisicing excepteur.
                     </div>
                     <label class="modal-checkbox">
                         <input type="checkbox" name="agree-terms">
@@ -75,6 +77,12 @@ const injectModal = () => {
     `;
     
     document.body.appendChild(modalContainer);
+
+    // 이미지 로고 설정
+    const mainLogoElement = modalContainer.querySelector('#main-logo');
+    if (mainLogoElement) {
+        mainLogoElement.src = mainLogoSrc;
+    }
 
     // 주입 직후 체크박스 이벤트 바인딩
     setupCheckboxLogic(modalContainer);
@@ -93,7 +101,7 @@ const setupCheckboxLogic = (container) => {
         if (allChecked) {
             setTimeout(() => {
                 modalOverlay.classList.add('hidden');
-                // 팝업에게 "사용자가 동의를 완료했다"는 신호를 보냄
+                // 팝업에게 사용자 동의 신호 전송
                 chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
             }, 300);
         }

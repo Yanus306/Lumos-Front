@@ -1,9 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Lumos - Dark Pattern Detector",
+  "name": "Lumos",
   "version": "1.0.0",
-  "description": "웹 페이지 내 다크 패턴을 감지하고 차단합니다.",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage"],
   "action": {
     "default_popup": "popup/popup.html"
   },
@@ -11,12 +10,13 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content/content.js"],
-      "css": ["content/content.css"]
+      "css": ["content/style.css"] 
     }
   ],
-  "icons": {
-    "16": "assets/text-logo-CBTeAGyA.svg", 
-    "48": "assets/text-logo-CBTeAGyA.svg",
-    "128": "assets/text-logo-CBTeAGyA.svg"
-  }
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
