@@ -1,14 +1,15 @@
 import TextLogo from "../assets/text-logo.svg";
 
 // 글자 로고
-const logoImg = document.querySelector('#text-logo');
-logoImg.src = TextLogo;
+const TextLogo = document.querySelector('#text-logo');
+TextLogo.src = TextLogo;
 
-// main.js
-import Logo from "../assets/logo.svg";
+
+// content.js
+import MainLogo from "../assets/main-logo.svg";
 // 그림 로고
-const logoImg = document.querySelector('#logo');
-logoImg.src = Logo;
+const MainLogo = document.querySelector('#main-logo');
+MainLogo.src = MainLogo;
 
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('lumos-modal');

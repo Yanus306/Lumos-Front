@@ -38,24 +38,106 @@
 
     display: flex;
     flex-direction: column;
-    gap: 6px;
-
-    background-color: aqua;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .modal-title {
+    font-size: 20px;
+    font-weight: bold;
 
+    margin-left: 11px;
+    margin-right: auto;
+
+    color: var(--font1-color);
 }
 
 .modal-content-container {
     width: 701px;
     height: 213px;
+    padding: 18px 36px;
 
+    border-radius: 10px;
+    border: 2px solid var(--main-color);
+    color: var(--font1-color);
+    font-size: 12px;
 
+    overflow-y: auto; 
 }
 
-.modal-radio {
+/* 스크롤 */
+.modal-content-container::-webkit-scrollbar {
+    width: 25px; 
+}
 
+.modal-content-container::-webkit-scrollbar-thumb {
+    background-color: white;
+    background-clip: padding-box; 
+    
+    border: 8px solid transparent; 
+    
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 1px var(--font2-color); 
+}
+
+.modal-content-container::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* 체크박스 */
+.modal-checkbox input {
+    display: none;
+}
+
+.modal-checkbox {
+    width: 113px;
+    height: 24px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.checkbox-mark {
+    width: 16px;
+    height: 16px;
+
+    position: relative;
+    display: inline-block;
+
+    border: 2px solid var(--main-color);
+    border-radius: 4px;
+}
+
+.checkbox-mark::after {
+    content: "";
+    position: absolute;
+    
+    width: 8px;
+    height: 8px;
+
+    display: none;
+    top: 50%;
+    left: 50%;
+
+    background-color: var(--main-color);
+    border-radius: 2px;
+    transform: translate(-50%, -50%);
+}
+
+.modal-checkbox input:checked + .checkbox-mark::after {
+    display: block; 
+}
+
+.modal-checkbox input:checked + .checkbox-mark {
+    border-color: var(--main-color);
+}
+
+.checkbox-text {
+    font-size: 20px;
+    color: var(--font1-color);
 }
 
 /* 모달 숨기기용 클래스 */

@@ -5,6 +5,7 @@ export default defineConfig({
   root: 'src', 
   build: {
     outDir: '../dist',
+    enptyOutDir: true, 
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'src/popup/popup.html'),
