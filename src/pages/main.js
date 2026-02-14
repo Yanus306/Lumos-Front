@@ -1,31 +1,36 @@
-import TextLogo from "../assets/text-logo.svg";
+import textLogoSrc from "../assets/text-logo.svg";
 
 // 글자 로고
-const TextLogo = document.querySelector('#text-logo');
-TextLogo.src = TextLogo;
+const textLogoElement = document.querySelector('#text-logo');
+if (textLogoElement) textLogoElement.src = textLogoSrc;
+
+
 
 
 // content.js
-import MainLogo from "../assets/main-logo.svg";
-// 그림 로고
-const MainLogo = document.querySelector('#main-logo');
-MainLogo.src = MainLogo;
+import mainLogoSrc from "../assets/main-logo.svg";
 
+// 이미지 로고
+const mainLogoElement = document.querySelector('#main-logo');
+if (mainLogoElement) mainLogoElement.src = mainLogoSrc;
+
+// 체크박스 감지 로직
 document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('lumos-modal');
-    const closeX = document.getElementById('close-modal-btn');
-    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const modal = document.querySelector('.modal-overlay');
+    const checkboxes = document.querySelectorAll('.modal-container input[type="checkbox"]');
 
-    // 닫기 함수
-    const closeModal = () => {
-        modal.classList.add('hidden');
+    const handleCheck = () => {
+        // 모든 체크박스의 상태 확인
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        if (allChecked) {
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
     };
 
-    closeX.addEventListener('click', closeModal);
-    confirmBtn.addEventListener('click', closeModal);
-
-    // 배경 클릭 시 닫기
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', handleCheck);
     });
 });
