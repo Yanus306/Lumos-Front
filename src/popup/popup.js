@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // UI 요소 로드
   const toOnBtn = document.getElementById('to-on-btn');
   const toOffBtn = document.getElementById('to-off-btn');
   const viewOff = document.getElementById('view-off');
@@ -7,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const labelText = document.querySelector('.center-layout .label-text');
   const riskTitle = document.querySelector('.risk-title');
 
-  // [함수] 점수별 게이지 색상 업데이트
+  // --- [상대방 기능] 점수 및 게이지 UI 업데이트 ---
   function updateDonutGauge(score, status) {
     const meters = {
       high: document.getElementById('meter-high'),
@@ -55,64 +56,71 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // [함수] 데이터 로드 (테스트용)
+  // --- [통합 기능] 데이터 로드 및 화면 전환 ---
+  
+  // 데이터 로드 (실제 데이터나 Mock 데이터를 가져와 게이지 업데이트)
   function fetchAndShowRisk() {
     const mockBackendData = { score: 85, status: "고위험" };
     updateDonutGauge(mockBackendData.score, mockBackendData.status);
   }
 
-  // [함수] ON 뷰 전환 실행
+  // ON 뷰 전환 실행 (모달이 닫힌 후 호출됨)
   function proceedToOnView() {
+    // 1. 상태 메시지 업데이트
+    if (statusMsg) {
+      statusMsg.textContent = "보호가 활성화됨";
+      statusMsg.style.color = "#383838";
+    }
+
+    // 2. 토글 내부 글자 변경 애니메이션
+    if (labelText) {
+      labelText.style.opacity = '0';
+      setTimeout(() => {
+        labelText.textContent = "ON";
+        labelText.style.left = "25px";
+        labelText.style.opacity = '1';
+      }, 200);
+    }
+
+    // 3. 뷰 전환 애니메이션
     setTimeout(() => {
       viewOff.classList.remove('active');
       setTimeout(() => {
         viewOn.classList.add('active'); 
-        if (toOffBtn) toOffBtn.checked = true;
-        fetchAndShowRisk(); 
+        if (toOffBtn) toOffBtn.checked = true; // 미니 토글 상태 맞춤
+        fetchAndShowRisk(); // 게이지 데이터 로드 및 출력
       }, 300);
     }, 200);
   }
 
-  // [이벤트] 메인 토글 ON (보호 활성화)
+  // --- [이벤트] 1. OFF -> ON 메인 토글 (모달 신호 전송) ---
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        if (labelText) {
-          labelText.style.opacity = '0';
-          setTimeout(() => {
-            labelText.textContent = "ON";
-            labelText.style.left = "25px";
-            labelText.style.opacity = '1';
-          }, 200);
-        }
-        if (statusMsg) {
-          statusMsg.textContent = "보호가 활성화됨";
-          statusMsg.style.color = "#919191";
-        }
+        // [중요] 스토리지에 true를 저장하여 content.js에서 모달을 띄우게 함
+        chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
+          console.log("✅ [Lumos] 모달 주입 신호 전송 완료");
+        });
         
-        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ lumosDetectEnabled: true });
-        }
-        proceedToOnView();
+        // 실제 화면 전환은 모달 동의가 끝난 후(MODAL_COMPLETE)에 수행되므로
+        // 현재 버튼은 다시 체크 해제 상태로 시각적 대기
+        this.checked = false;
       }
     });
   }
 
-  // [이벤트] 미니 토글 OFF (보호 비활성화 및 리셋)
+  // --- [이벤트] 2. ON -> OFF 미니 토글 (보호 비활성화) ---
   if (toOffBtn) {
     toOffBtn.addEventListener('change', function() {
       if (!this.checked) {
-        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ lumosDetectEnabled: false });
-        }
-        
+        // 스토리지 해제 및 뷰 리셋
+        chrome.storage.local.set({ lumosDetectEnabled: false });
         viewOn.classList.remove('active');
         
         setTimeout(() => {
           viewOff.classList.add('active');
-          
-          // 토글 및 텍스트 상태 초기화
           if (toOnBtn) toOnBtn.checked = false; 
+          
           if (labelText) {
             labelText.textContent = "OFF";
             labelText.style.left = "55px";
@@ -126,4 +134,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // --- [이벤트] 3. Content Script로부터 모달 완료 신호 수신 ---
+  chrome.runtime.onMessage.addListener((request) => {
+    if (request.action === "MODAL_COMPLETE") {
+      console.log("✅ [Lumos] 사용자가 모달에 동의함. 화면 전환 시작.");
+      // 실제 토글 상태를 ON으로 바꾸고 뷰 전환 실행
+      if (toOnBtn) toOnBtn.checked = true;
+      proceedToOnView();
+    }
+  });
 });
