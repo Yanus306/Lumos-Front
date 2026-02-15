@@ -97,14 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        // [중요] 스토리지에 true를 저장하여 content.js에서 모달을 띄우게 함
         chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
-          console.log("✅ [Lumos] 모달 주입 신호 전송 완료");
+          console.log("✅ [Lumos] 스토리지 저장 완료");
+          
+          // [추가] 현재 활성화된 탭에 직접 메시지 전송
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]) {
+              chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" });
+            }
+          });
         });
-        
-        // 실제 화면 전환은 모달 동의가 끝난 후(MODAL_COMPLETE)에 수행되므로
-        // 현재 버튼은 다시 체크 해제 상태로 시각적 대기
-        this.checked = false;
+        this.checked = false; // 대기 상태 유지
       }
     });
   }

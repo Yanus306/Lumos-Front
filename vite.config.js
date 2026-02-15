@@ -3,7 +3,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: 'src',
-  publicDir: resolve(__dirname, 'public'),
+  // publicDir을 상대 경로로 정확히 지정 (src 기준 상위의 public)
+  publicDir: resolve(__dirname, 'public'), 
   build: {
     outDir: '../dist',
     emptyOutDir: true,
@@ -16,10 +17,11 @@ export default defineConfig({
       output: {
         entryFileNames: `[name]/[name].js`,
         assetFileNames: (assetInfo) => {
-
+          // CSS 파일만 content 폴더로 보냅니다.
           if (assetInfo.name.endsWith('.css')) return 'content/style.css';
-          return 'assets/[name]-[hash][extname]';
-        }
+          // 그 외 빌드 중 생성되는 자산은 원래 이름을 유지합니다.
+          return 'assets/[name][extname]';
+        },
       },
     },
   },
