@@ -4,86 +4,124 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewOff = document.getElementById('view-off');
   const viewOn = document.getElementById('view-on');
   const statusMsg = document.getElementById('status-msg');
-  const labelText = document.querySelector('.center-layout .label-text'); // OFF/ON 글자
+  const labelText = document.querySelector('.center-layout .label-text');
+  const riskTitle = document.querySelector('.risk-title');
 
-  const levels = ['low', 'mid', 'high'];
+  // [함수] 점수별 게이지 색상 업데이트
+  function updateDonutGauge(score, status) {
+    const meters = {
+      high: document.getElementById('meter-high'),
+      mid: document.getElementById('meter-mid'),
+      low: document.getElementById('meter-low')
+    };
 
-  function updateRisk(targetLevel) {
+    // 초기화 (전체 회색)
+    Object.values(meters).forEach(m => { 
+      if(m) m.style.setProperty('stroke', '#e0e0e2', 'important'); 
+    });
+
+    // 점수 구간별 색상 적용
+    let currentLevel = 'low';
+    if (score >= 66) {
+      currentLevel = 'high';
+      if(meters.high) meters.high.style.setProperty('stroke', '#011139', 'important');
+    } else if (score >= 33) {
+      currentLevel = 'mid';
+      if(meters.mid) meters.mid.style.setProperty('stroke', '#6b62AA', 'important');
+    } else {
+      currentLevel = 'low';
+      if(meters.low) meters.low.style.setProperty('stroke', '#9B9AC4', 'important');
+    }
+
+    if (riskTitle) riskTitle.textContent = status;
+    applyLabelStyles(currentLevel);
+  }
+
+  // [함수] 활성화된 라벨 흰색 강조
+  function applyLabelStyles(activeLevel) {
+    const levels = ['low', 'mid', 'high'];
     levels.forEach(level => {
-      const meterPiece = document.getElementById(`meter-${level}`);
-      const targetLabel = document.getElementById(`txt-${level}`);
-
-      if (level === targetLevel) {
-        if (meterPiece) meterPiece.classList.add('active');
-        if (targetLabel) {
-          targetLabel.style.opacity = "1";
-          targetLabel.style.fontWeight = "900";
-          targetLabel.style.transform = "translate(-50%, -50%) scale(1.1)"; 
-        }
-      } else {
-        if (meterPiece) meterPiece.classList.remove('active');
-        if (targetLabel) {
-          targetLabel.style.opacity = "0.4";
-          targetLabel.style.fontWeight = "500";
-          targetLabel.style.transform = "translate(-50%, -50%) scale(1)";
+      const label = document.getElementById(`txt-${level}`);
+      if (label) {
+        label.style.fontWeight = "500";
+        if (level === activeLevel) {
+          label.style.setProperty('color', '#ffffff', 'important');
+          label.style.opacity = "1";
+        } else {
+          label.style.setProperty('color', '#383838', 'important');
+          label.style.opacity = "0.4";
         }
       }
     });
   }
 
-  // OFF -> ON 토글 클릭 이벤트
+  // [함수] 데이터 로드 (테스트용)
+  function fetchAndShowRisk() {
+    const mockBackendData = { score: 85, status: "고위험" };
+    updateDonutGauge(mockBackendData.score, mockBackendData.status);
+  }
+
+  // [함수] ON 뷰 전환 실행
+  function proceedToOnView() {
+    setTimeout(() => {
+      viewOff.classList.remove('active');
+      setTimeout(() => {
+        viewOn.classList.add('active'); 
+        if (toOffBtn) toOffBtn.checked = true;
+        fetchAndShowRisk(); 
+      }, 300);
+    }, 200);
+  }
+
+  // [이벤트] 메인 토글 ON (보호 활성화)
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        // 1. 상태 메시지 즉시 변경
-        if (statusMsg) { 
-          statusMsg.textContent = "보호가 활성화됨"; 
-          statusMsg.style.color = "#383838"; 
-        }
-
-        // 2. 토글 내부 글자 변경 및 위치 이동 (원의 반대편으로)
         if (labelText) {
-          labelText.style.opacity = '0'; // 잠시 숨김
+          labelText.style.opacity = '0';
           setTimeout(() => {
             labelText.textContent = "ON";
-            labelText.style.left = "25px"; // 원이 우측으로 갔으니 글자는 좌측으로
+            labelText.style.left = "25px";
             labelText.style.opacity = '1';
           }, 200);
         }
+        if (statusMsg) {
+          statusMsg.textContent = "보호가 활성화됨";
+          statusMsg.style.color = "#919191";
+        }
         
-        // 3. 토글 애니메이션(0.4초)을 충분히 보여준 뒤 화면 전환
-        setTimeout(() => {
-          viewOff.classList.remove('active');
-          setTimeout(() => {
-            viewOn.classList.add('active');
-            if (toOffBtn) toOffBtn.checked = true;
-            setTimeout(() => updateRisk('high'), 400); 
-          }, 300);
-        }, 500); // 0.5초 대기 (토글 이동 감상 시간)
+        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ lumosDetectEnabled: true });
+        }
+        proceedToOnView();
       }
     });
   }
 
-  // ON -> OFF 토글 클릭 이벤트
+  // [이벤트] 미니 토글 OFF (보호 비활성화 및 리셋)
   if (toOffBtn) {
     toOffBtn.addEventListener('change', function() {
       if (!this.checked) {
+        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ lumosDetectEnabled: false });
+        }
+        
         viewOn.classList.remove('active');
         
         setTimeout(() => {
           viewOff.classList.add('active');
-          if (toOnBtn) toOnBtn.checked = false;
           
-          // 글자 및 상태 메시지 원복
+          // 토글 및 텍스트 상태 초기화
+          if (toOnBtn) toOnBtn.checked = false; 
           if (labelText) {
             labelText.textContent = "OFF";
-            labelText.style.left = "65.29px";
+            labelText.style.left = "55px";
+            labelText.style.opacity = '1';
           }
-          if (statusMsg) { 
-            statusMsg.textContent = "보호가 비활성화됨"; 
-            statusMsg.style.color = "#bbb"; 
+          if (statusMsg) {
+            statusMsg.textContent = "보호가 비활성화됨";
+            statusMsg.style.color = "#bbb";
           }
-          updateRisk('none');
         }, 300);
       }
     });
