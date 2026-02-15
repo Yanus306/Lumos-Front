@@ -1,55 +1,71 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="container">
+
     <div id="view-off" class="page-view active">
       <div class="center-layout">
         <img src="logo.svg" alt="Logo" class="logo-main">
         <h1 class="title">다크 패턴 분석</h1>
         <p class="description">데이터를 자동으로 분석하여<br>더 정확한 결과를 제공합니다.</p>
         <p id="status-msg" class="status-text">보호가 비활성화됨</p>
-        <label class="toggle-btn">
-          <input type="checkbox" id="to-on-btn">
-          <span class="slider"><span id="text-p1" class="label-text">OFF</span></span>
-        </label>
+
+        <div class="toggle-btn">
+          <input type="checkbox" id="to-on-btn"> 
+          <label for="to-on-btn" class="slider">
+            <span id="text-p1" class="label-text">OFF</span>
+          </label>
+        </div>
       </div>
     </div>
 
     <div id="view-on" class="page-view">
       <div class="top-header">
         <img src="logo.svg" alt="Logo" class="logo-mini">
-        <label class="toggle-btn mini">
+        
+        <div class="toggle-btn mini">
           <input type="checkbox" id="to-off-btn" checked>
-          <span class="slider-on"><span id="text-p2" class="label-text">ON</span></span>
-        </label>
+          <label for="to-off-btn" class="slider-on">
+            <span id="text-p2" class="label-text">ON</span>
+          </label>
+        </div>
       </div>
-      
+
       <div class="analysis-content">
         <h1 class="title-mini">다크 패턴 분석</h1>
         
         <div class="chart-container">
           <svg viewBox="0 0 100 100" class="donut-svg">
-            <circle class="chart-bg" cx="50" cy="50" r="35"></circle>
-            <circle id="meter-low" class="meter low" cx="50" cy="50" r="35"></circle>
-            <circle id="meter-mid" class="meter mid" cx="50" cy="50" r="35"></circle>
-            <circle id="meter-high" class="meter high" cx="50" cy="50" r="35"></circle>
+            <circle class="chart-bg" cx="50" cy="50" r="34"></circle>
+            
+            <circle id="meter-low" class="meter" cx="50" cy="50" r="34" 
+                    stroke-dasharray="71.2 213.6" transform="rotate(150 50 50)"></circle>
+            
+            <circle id="meter-mid" class="meter" cx="50" cy="50" r="34" 
+                    stroke-dasharray="71.2 213.6" transform="rotate(30 50 50)"></circle>
+            
+            <circle id="meter-high" class="meter" cx="50" cy="50" r="34" 
+                    stroke-dasharray="71.2 213.6" transform="rotate(-90 50 50)"></circle>
           </svg>
           
           <div class="labels-overlay">
+            <span id="txt-high" class="guide-label high">고위험</span>
             <span id="txt-low" class="guide-label low">저위험</span>
             <span id="txt-mid" class="guide-label mid">중위험</span>
-            <span id="txt-high" class="guide-label high">고위험</span>
           </div>
         </div>
-
+        
         <h2 class="risk-title">위험도</h2>
       </div>
     </div>
+
   </div>
-  <script src="popup.js"></script>
+  <script type="module" src="./popup.js"></script>
 </body>
 </html>

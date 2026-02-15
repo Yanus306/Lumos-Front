@@ -1,3 +1,4 @@
+
 /* 기본 초기화 */
 * {
   margin: 0;
@@ -24,7 +25,7 @@ body {
   overflow: hidden;
 }
 
-/*두 페이지를 겹쳐서 나열 방지 */
+/* [2] 페이지 전환 설정 */
 .page-view {
   position: absolute !important;
   top: 0 !important;
@@ -33,11 +34,12 @@ body {
   height: 100% !important;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.4s ease-in-out;
+  transition: opacity 0.4s ease-in-out, visibility 0.4s;
 }
+
 .page-view.active {
-  opacity: 1;
-  visibility: visible;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* =========================================
@@ -59,6 +61,7 @@ body {
   width: 145px;
   height: 150px;
 }
+
 .title {
   position: absolute;
   left: 87;
@@ -71,6 +74,7 @@ body {
   text-align: center;
   letter-spacing: -0.02em;
 }
+
 .description {
   position: absolute;
   left: 0px;
@@ -83,6 +87,7 @@ body {
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
+
 .status-text {
   position: absolute;
   left: 0;
@@ -94,7 +99,7 @@ body {
   transition: 0.3s;
 }
 
-/*메인 토글 버튼 구조 */
+/* [3] 메인 토글 버튼 (OFF) */
 .center-layout .toggle-btn {
   position: absolute;
   left: 117px;
@@ -104,19 +109,25 @@ body {
   cursor: pointer;
 }
 
-/* 초기 상태: 연한 회색 배경 */
 .slider {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: #dedede !important;
   border-radius: 40px;
-  transition: 0.4s;
+  transition: background-color 0.4s ease;
 }
 
-/* 흰색 원 초기 위치: 왼쪽 */
+/* 체크 안됐을 때 (OFF) 배경색 강제 */
+#to-on-btn:not(:checked) + .slider {
+  background-color: #dedede !important;
+}
+
+/* 체크 됐을 때 (ON) 배경색 변경 */
+#to-on-btn:checked + .slider {
+  background-color: #011139 !important;
+}
+
+/* 토글 흰색 원 */
 .slider:before {
   content: "";
   position: absolute;
@@ -126,11 +137,17 @@ body {
   height: 34.83px;
   background: white;
   border-radius: 50%;
-  transition: 0.4s ease-in-out;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 4px #00000040;
+  z-index: 2;
 }
 
-/* OFF 텍스트 위치 및 색상 보정 */
+/* 체크 시 원 이동 */
+#to-on-btn:checked + .slider:before {
+  transform: translateX(71px);
+}
+
+/* 토글 내부 텍스트 */
 .center-layout .label-text {
   position: absolute;
   left: 55px;
@@ -139,17 +156,8 @@ body {
   color: #fff;
   font-size: 16px;
   font-weight: 300;
-  transition: 0.3s;
-}
-
-/*체크 시 배경색 변경: 회색 -> 남색 */
-input:checked + .slider {
-  background-color: #001233 !important;
-}
-
-/*체크 시 원 이동: 71px만큼 우측 이동 */
-input:checked + .slider:before {
-  transform: translateX(71px);
+  transition: opacity 0.3s ease;
+  z-index: 1;
 }
 
 /* =========================================
@@ -158,115 +166,133 @@ input:checked + .slider:before {
 .logo-mini {
   position: absolute;
   left: 36px;
-  top: 40px;
-  width: 43px;
-  height: 45px;
+  top: 59px;
+  width: 40px;
+  height: 43px;
   object-fit: contain;
 }
+
 .top-header .toggle-btn.mini {
   position: absolute;
   left: 245px;
-  top: 40px;
+  top: 59px;
   width: 70px;
   height: 27px;
   cursor: pointer;
 }
+
+/* 미니 토글 배경 */
 .slider-on {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #10023d !important;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #011139 !important;
   border-radius: 27px;
+  transition: background-color 0.4s;
 }
+
 .slider-on:before {
   content: "";
   position: absolute;
-  left: 45px;
-  top: 3px;
-  width: 21px;
-  height: 21px;
+  left: 5px;
+  top: 3.5px;
+  width: 20px;
+  height: 20px;
   background: white;
   border-radius: 50%;
+  transition: transform 0.4s ease-in-out;
 }
+
+/* ON 상태 원 위치 */
+#to-off-btn:checked + .slider-on:before {
+  transform: translateX(40px);
+}
+
+/* 돌아올 때 배경색 복구 */
+#to-off-btn:not(:checked) + .slider-on {
+  background-color: #dedede !important;
+}
+
 #text-p2.label-text {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: white;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 330;
+  z-index: 1;
 }
 
 .title-mini {
   position: absolute;
   left: 0;
-  top: 120px;
+  top: 111px;
   width: 100%;
   text-align: center;
   font-size: 32px;
-  font-weight: 800;
-  color: #000;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  color: #383838;
 }
 
-/* 도넛 그래프 중앙 정렬 및 검은 원 방지 */
+/* [4] 도넛 차트 레이아웃 */
 .chart-container {
   position: absolute;
   left: 50%;
-  top: 285px;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
-}
-.donut-svg circle {
-  fill: none !important;
-  stroke-width: 35 !important;
-}
-.chart-bg {
-  stroke: #e0e0e2;
-}
-.meter.high {
-  stroke: #100252;
-  stroke-dasharray: 80 300;
+  top: 280px; 
+  transform: translate(-50%, -50%); 
+  width: 195.5px; 
+  height: 230.37px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* 내부 라벨 */
+.donut-svg {
+  width: 190px;    
+  height: 190px;
+}
+
+.donut-svg circle {
+  fill: none;
+  stroke-width: 30 !important;
+  stroke-linecap: butt;
+}
+
+.chart-bg { stroke: #e0e0e2; }
+
+/* 고위험 게이지 기본 애니메이션 */
+.meter.high {
+  stroke: #011139;
+  stroke-dasharray: 0 213.6; 
+  transition: stroke-dasharray 0.8s ease-out; 
+}
+
+/* 내부 가이드 라벨 */
 .guide-label {
   position: absolute;
   font-size: 13px;
-  font-weight: 800;
-  color: #fff;
+  font-weight: 500 !important;
   transform: translate(-50%, -50%);
+  white-space: nowrap;
+  pointer-events: none;
 }
-.guide-label.high {
-  top: 45%;
-  left: 72%;
-}
-.guide-label.low {
-  top: 45%;
-  left: 28%;
-  opacity: 0.6;
-}
-.guide-label.mid {
-  top: 78%;
-  left: 50%;
-  opacity: 0.6;
-}
+.guide-label.high { top: 37%; left: 79%; color: #383838; }
+.guide-label.low { top: 37%; left: 22%; color: #383838; }
+.guide-label.mid { top: 77%; left: 50%; color: #383838; }
 
 .risk-title {
   position: absolute;
-  left: 0;
-  bottom: 50px;
-  width: 100%;
+  left: 50%; 
+  top: 402.83px; 
+  transform: translateX(-50%);
+  font-size: 24px;   
+  font-weight: 700;  
+  color: #383838;  
   text-align: center;
-  font-size: 32px;
-  font-weight: 800;
-  color: #000;
 }
 
-/* [핵심] 체크박스 숨김 */
+/* 체크박스 숨김 */
 input[type="checkbox"] {
   display: none !important;
 }
