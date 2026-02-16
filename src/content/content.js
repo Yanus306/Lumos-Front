@@ -1,51 +1,41 @@
 console.log("🚨🚨🚨 LUMOS IS ALIVE! 🚨🚨🚨");
 
-const initLumos = () => {
-    chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
-        const isEnabled = result && result.lumosDetectEnabled;
-        console.log("Current Storage Status:", isEnabled);
-        if (isEnabled === true) {
-            injectModal();
+/* 함수 선언부 (리스너보다 위에 위치하여 Hoisting 에러 방지) */
+
+// 체크박스 로직: 모든 체크박스 선택 시 팝업으로 신호 전송
+const setupCheckboxLogic = (container) => {
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    const modalOverlay = container.querySelector('.modal-overlay');
+
+    const handleCheck = () => {
+        // allChecked 변수 선언 확인
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        if (allChecked) {
+            setTimeout(() => {
+                if (modalOverlay) {
+                    modalOverlay.style.display = 'none';
+                }
+                // 팝업으로 완료 신호 전송
+                chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
+                console.log("✅ 모든 약관 동의 완료 신호 전송");
+            }, 300);
         }
-    });
+    };
+
+    checkboxes.forEach(cb => cb.addEventListener('change', handleCheck));
 };
 
-// 로드 시점 확인
-if (document.readyState === 'complete') {
-    initLumos();
-} else {
-    window.addEventListener('load', initLumos);
-}
-
-// 스토리지 감지
-chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (namespace === 'local' && changes.lumosDetectEnabled) {
-        const isEnabled = changes.lumosDetectEnabled.newValue;
-        if (isEnabled === true) {
-            if (!document.querySelector('#lumos-injected-modal')) injectModal();
-        } else {
-            const existingModal = document.querySelector('#lumos-injected-modal');
-            if (existingModal) existingModal.remove();
-        }
-    }
-});
-
-// 팝업에서 보내는 직접 메시지 감지
-chrome.runtime.onMessage.addListener((request) => {
-    if (request.action === "SHOW_MODAL") {
-        injectModal();
-    }
-});
-
-/* 모달 주입 */
+// 모달 주입 함수
 const injectModal = () => {
     if (document.querySelector('#lumos-injected-modal')) return;
     
+    console.log("✅ 모달 주입 시작");
     const modalContainer = document.createElement('div');
     modalContainer.id = 'lumos-injected-modal';
     
-    // image_c87ac0.png 구조에 맞게 수정: dist 루트에 있으므로 파일명만 적음
-    const logoUrl = chrome.runtime.getURL("main-logo.svg");
+    // 로고 경로 설정
+    const logoUrl = chrome.runtime.getURL("assets/main-logo.svg");
 
     modalContainer.innerHTML = `
         <div class="modal-overlay">
@@ -81,19 +71,46 @@ const injectModal = () => {
     setupCheckboxLogic(modalContainer);
 };
 
-const setupCheckboxLogic = (container) => {
-    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    const modalOverlay = container.querySelector('.modal-overlay');
-
-    const handleCheck = () => {
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-        if (allChecked) {
-            setTimeout(() => {
-                if (modalOverlay) modalOverlay.style.display = 'none';
-                chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
-            }, 300);
+// 초기화 함수
+const initLumos = () => {
+    chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+        const isEnabled = result && result.lumosDetectEnabled;
+        console.log("Current Storage Status:", isEnabled);
+        if (isEnabled === true) {
+            injectModal();
         }
-    };
-
-    checkboxes.forEach(cb => cb.addEventListener('change', handleCheck));
+    });
 };
+
+/* 실행 및 리스너 등록부 */
+
+// 로드 시점 확인 후 초기화 실행
+if (document.readyState === 'complete') {
+    initLumos();
+} else {
+    window.addEventListener('load', initLumos);
+}
+
+// 스토리지 변경 감지 (다른 페이지에서의 동기화용)
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes.lumosDetectEnabled) {
+        const isEnabled = changes.lumosDetectEnabled.newValue;
+        if (isEnabled === true) {
+            if (!document.querySelector('#lumos-injected-modal')) injectModal();
+        } else {
+            const existingModal = document.querySelector('#lumos-injected-modal');
+            if (existingModal) existingModal.remove();
+        }
+    }
+});
+
+// 팝업에서 보내는 직접 메시지 감지
+// sender와 sendResponse를 포함하여 정의 (사용하지 않더라도 문법적 완전성 유지)
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "SHOW_MODAL") {
+        console.log("✅ 팝업으로부터 모달 주입 신호 수신");
+        injectModal();
+        if (sendResponse) sendResponse({status: "success"}); 
+    }
+    return true; // 비동기 응답을 위해 true 반환
+});
