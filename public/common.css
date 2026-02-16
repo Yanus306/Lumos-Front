@@ -46,11 +46,13 @@
 }
 
 /* 전역 변수 설정 */
-:root {
+#lumos-injected-modal, :root {
     --main-color: #01123D;
     --font1-color: #383838;
     --font2-color: #919191;
     --bg-color: #ffffff;
+    
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
 }
 
 /* 기본 스타일 초기화 */
@@ -58,16 +60,4 @@
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-    width: 10vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-    color: var(--font1-color);
-    background-color: var(--white);
-    line-height: 1.5;
 }

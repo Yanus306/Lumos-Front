@@ -25,10 +25,8 @@ const setupCheckboxLogic = (container) => {
 const injectModal = () => {
     if (document.querySelector('#lumos-injected-modal')) return;
     
-    console.log("✅ 모달 주입 시작");
     const modalContainer = document.createElement('div');
     modalContainer.id = 'lumos-injected-modal';
-    modalContainer.style.all = 'initial'; 
 
     const logoUrl = chrome.runtime.getURL("assets/main-logo.svg");
 
@@ -58,7 +56,7 @@ const injectModal = () => {
         </div>
     `;
     
-    document.body.appendChild(modalContainer);
+    document.documentElement.appendChild(modalContainer);
     setupCheckboxLogic(modalContainer);
 };
 
