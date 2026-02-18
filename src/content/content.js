@@ -9,15 +9,19 @@ const setupCheckboxLogic = (container) => {
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         
         if (allChecked) {
-            console.log("✅ 모든 약관 동의 완료");
-            setTimeout(() => {
-                if (modalOverlay) modalOverlay.classList.add('lumos-hidden');
-                // 팝업에 완료 신호 전송
-                chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
-            }, 300);
+            console.log("✅ 모든 약관 동의 완료 - 스토리지 직접 업데이트");
+            
+            // 1. 스토리지에 먼저 상태 저장 (팝업이 닫혀 있어도 데이터는 남음)
+            chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
+                setTimeout(() => {
+                    if (modalOverlay) modalOverlay.classList.add('lumos-hidden');
+                    
+                    // 2. 혹시나 팝업이 열려있을 경우를 위해 메시지 전송
+                    chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
+                }, 300);
+            });
         }
     };
-
     checkboxes.forEach(cb => cb.addEventListener('change', handleCheck));
 };
 

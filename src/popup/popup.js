@@ -87,17 +87,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- [로직] 1. 초기 상태 반영 ---
   chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
-    if (result.lumosDetectEnabled) {
-      viewOff.classList.remove('active');
-      viewOn.classList.add('active');
-      if (toOnBtn) toOnBtn.checked = true;
-      if (toOffBtn) toOffBtn.checked = true;
-      fetchAndShowRisk(); 
-    } else {
-      viewOff.classList.add('active');
-      viewOn.classList.remove('active');
-      if (toOnBtn) toOnBtn.checked = false;
-    }
+      if (result.lumosDetectEnabled) {
+          console.log("📡 스토리지에서 ON 상태 감지 - 화면 전환");
+          
+          // UI 요소들을 ON 상태로 즉시 변경
+          viewOff.classList.remove('active');
+          viewOn.classList.add('active');
+          if (toOnBtn) toOnBtn.checked = true;
+          if (toOffBtn) toOffBtn.checked = true; // ON 뷰 내의 토글도 ON으로
+          
+          if (labelText) {
+              labelText.textContent = "ON";
+              labelText.style.left = "25px";
+          }
+          
+          fetchAndShowRisk(); 
+      } else {
+          viewOff.classList.add('active');
+          viewOn.classList.remove('active');
+          if (toOnBtn) toOnBtn.checked = false;
+      }
   });
 
   // --- [로직] 2. OFF -> ON 토글 클릭 ---
@@ -143,9 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- [로직] 4. 모달 완료 신호 수신 ---
   chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "MODAL_COMPLETE") {
-      console.log("✅ 모달 동의 확인됨. 화면 전환.");
-      if (toOnBtn) toOnBtn.checked = true;
-      proceedToOnView();
+      console.log("✅ 모달 동의 확인됨. 스토리지 업데이트 및 화면 전환.");
+      
+      // 모달 동의 완료 시 스토리지에 ON 상태 저장
+      chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
+        if (toOnBtn) toOnBtn.checked = true;
+        proceedToOnView(); // 게이지 화면으로 전환하는 기존 함수 실행
+      });
     }
   });
 });
