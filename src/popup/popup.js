@@ -61,9 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function proceedToOnView() {
+    // --- [1단계] 토글 버튼 애니메이션 시작 ---
+    // 팝업 내의 실제 체크박스를 체크하여 토글이 오른쪽으로 이동하게 합니다.
+    if (toOnBtn) toOnBtn.checked = true;
+
+    // 상태 메시지와 레이블 텍스트 업데이트 (시각적 피드백)
     if (statusMsg) {
-      statusMsg.textContent = "보호가 활성화됨";
-      statusMsg.style.color = "#383838";
+      statusMsg.textContent = "보호 활성화 중..."; // 잠시 대기하는 동안 표시될 문구
+      statusMsg.style.color = "#6D62AA"; // 강조색
     }
 
     if (labelText) {
@@ -75,14 +80,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 200);
     }
 
+    // --- [2단계] 의도적인 대기 시간 설정 ---
+    // 토글이 움직이는 것을 사용자가 충분히 볼 수 있도록 멈춥니다.
+    const waitTime = 5000; // 💡 여기서 멈추는 시간을 조절하세요 (1000 = 1초)
+
     setTimeout(() => {
+      // --- [3단계] 화면 전환 (페이드 아웃/인) ---
+      
+      // OFF 뷰를 부드럽게 사라지게 함
       viewOff.classList.remove('active');
+
       setTimeout(() => {
+        // ON 뷰(게이지 화면) 등장
         viewOn.classList.add('active'); 
+        
+        // ON 뷰 내부에 있는 상단 미니 토글도 ON 상태로 동기화
         if (toOffBtn) toOffBtn.checked = true;
+
+        if (statusMsg) {
+          statusMsg.textContent = "보호가 활성화됨";
+          statusMsg.style.color = "#383838";
+        }
+
+        // 게이지 애니메이션 실행
         fetchAndShowRisk();
-      }, 300);
-    }, 200);
+      }, 2000); // CSS transition 시간에 맞춘 지연 (0.3초)
+      
+    }, waitTime);
   }
 
   // --- [로직] 1. 초기 상태 반영 ---
