@@ -64,11 +64,12 @@ const injectModal = () => {
     setupCheckboxLogic(modalContainer);
 };
 
-// 초기화 및 스토리지 감지 로직 (추가 권장)
+// 초기화 및 스토리지 감지 로직
 const initLumos = () => {
     chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
         if (result.lumosDetectEnabled === true) {
-            injectModal();
+            console.log("🛡️ Lumos 보호 활성화 상태 (이미 동의함)");
+            // 여기서 모달 주입 대신 'AI 분석 시작' 함수 실행
         }
     });
 };
@@ -83,9 +84,8 @@ if (document.readyState === 'complete') {
 // 스토리지 변경 감지 (다른 탭에서 OFF 했을 때 모달 제거 등)
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.lumosDetectEnabled) {
-        if (changes.lumosDetectEnabled.newValue === true) {
-            injectModal();
-        } else {
+        // 기능이 꺼졌을 때만 모달 즉시 제거
+        if (changes.lumosDetectEnabled.newValue === false) {
             const existingModal = document.querySelector('#lumos-injected-modal');
             if (existingModal) existingModal.remove();
         }
@@ -96,7 +96,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "SHOW_MODAL") {
         console.log("✅ 팝업으로부터 모달 주입 신호 수신");
-        injectModal();
+        injectModal(); 
         if (sendResponse) sendResponse({status: "success"});
     }
     return true;

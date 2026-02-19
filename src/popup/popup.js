@@ -16,26 +16,35 @@ document.addEventListener('DOMContentLoaded', () => {
       low: document.getElementById('meter-low')
     };
 
-    // 게이지 초기화
+    // 게이지 색상 초기화 (회색으로)
     Object.values(meters).forEach(m => { 
       if(m) m.style.setProperty('stroke', '#e0e0e2', 'important'); 
     });
 
-    // 점수 구간별 색상 적용 (사용자 정의 색상 반영)
+    // 점수 구간별 색상 적용
     let currentLevel = 'low';
     if (score >= 66) {
       currentLevel = 'high';
-      if(meters.high) meters.high.style.setProperty('stroke', '#100252', 'important'); // 고위험
+      if(meters.high) meters.high.style.setProperty('stroke', '#100252', 'important'); 
     } else if (score >= 33) {
       currentLevel = 'mid';
-      if(meters.mid) meters.mid.style.setProperty('stroke', '#6D62AA', 'important'); // 중위험
+      if(meters.mid) meters.mid.style.setProperty('stroke', '#6D62AA', 'important'); 
     } else {
       currentLevel = 'low';
-      if(meters.low) meters.low.style.setProperty('stroke', '#9B9AC4', 'important'); // 저위험
+      if(meters.low) meters.low.style.setProperty('stroke', '#9B9AC4', 'important'); 
     }
 
+    // 화면 중앙에 "고위험" 등 텍스트 표시
     if (riskTitle) riskTitle.textContent = status;
     applyLabelStyles(currentLevel);
+  }
+
+  function fetchAndShowRisk() {
+    // 실제 서버가 없으니 임시 데이터 사용
+    const mockBackendData = { score: 85, status: "고위험" };
+    
+    console.log("📊 게이지 업데이트 시작:", mockBackendData);
+    updateDonutGauge(mockBackendData.score, mockBackendData.status);
   }
 
   function applyLabelStyles(activeLevel) {
@@ -55,58 +64,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- [함수] 화면 전환 로직 ---
-  function fetchAndShowRisk() {
-    const mockBackendData = { score: 85, status: "고위험" };
-    updateDonutGauge(mockBackendData.score, mockBackendData.status);
-  }
-
   function proceedToOnView() {
-    // --- [1단계] 토글 버튼 애니메이션 시작 ---
-    // 팝업 내의 실제 체크박스를 체크하여 토글이 오른쪽으로 이동하게 합니다.
-    if (toOnBtn) toOnBtn.checked = true;
-
-    // 상태 메시지와 레이블 텍스트 업데이트 (시각적 피드백)
-    if (statusMsg) {
-      statusMsg.textContent = "보호 활성화 중..."; // 잠시 대기하는 동안 표시될 문구
-      statusMsg.style.color = "#6D62AA"; // 강조색
+    // --- [1단계] 토글 스위치만 먼저 ON으로 변경 ---
+    // 첫 번째 화면에 있는 체크박스를 체크하여 원이 이동하게 합니다.
+    if (toOnBtn) {
+        toOnBtn.checked = true;
     }
 
+    // 레이블 텍스트를 ON으로 변경 (위치 이동 애니메이션 포함)
     if (labelText) {
-      labelText.style.opacity = '0';
-      setTimeout(() => {
         labelText.textContent = "ON";
         labelText.style.left = "25px";
-        labelText.style.opacity = '1';
-      }, 200);
     }
 
-    // --- [2단계] 의도적인 대기 시간 설정 ---
-    // 토글이 움직이는 것을 사용자가 충분히 볼 수 있도록 멈춥니다.
-    const waitTime = 5000; // 💡 여기서 멈추는 시간을 조절하세요 (1000 = 1초)
+    if (statusMsg) {
+        statusMsg.textContent = "보호 활성화 중...";
+    }
+
+    // --- [2단계] 첫 번째 화면 상태에서 '잠시 멈춤' ---
+    // 사용자가 스위치가 바뀐 것을 인지할 수 있도록 시간을 줍니다.
+    const pauseTime = 1000; // 💡 1초 동안 첫 화면 유지 (원하는 대로 조절하세요)
 
     setTimeout(() => {
-      // --- [3단계] 화면 전환 (페이드 아웃/인) ---
-      
-      // OFF 뷰를 부드럽게 사라지게 함
-      viewOff.classList.remove('active');
+        // --- [3단계] 이제서야 두 번째 화면으로 전환 ---
+        // 1. 첫 번째 화면 페이드 아웃 시작
+        viewOff.classList.remove('active');
 
-      setTimeout(() => {
-        // ON 뷰(게이지 화면) 등장
-        viewOn.classList.add('active'); 
+        // 2. CSS 트랜지션(0.4s)이 끝날 때쯤 두 번째 화면 등장
+        setTimeout(() => {
+            viewOn.classList.add('active');
+            
+            // 두 번째 화면의 상단 미니 토글도 ON 상태로 맞춰줌
+            if (toOffBtn) toOffBtn.checked = true;
+            
+            if (statusMsg) {
+                statusMsg.textContent = "보호가 활성화됨";
+            }
+
+            // 게이지 로드
+            fetchAndShowRisk();
+        }, 400); // .page-view의 transition 시간과 맞춤
         
-        // ON 뷰 내부에 있는 상단 미니 토글도 ON 상태로 동기화
-        if (toOffBtn) toOffBtn.checked = true;
-
-        if (statusMsg) {
-          statusMsg.textContent = "보호가 활성화됨";
-          statusMsg.style.color = "#383838";
-        }
-
-        // 게이지 애니메이션 실행
-        fetchAndShowRisk();
-      }, 2000); // CSS transition 시간에 맞춘 지연 (0.3초)
-      
-    }, waitTime);
+    }, pauseTime);
   }
 
   // --- [로직] 1. 초기 상태 반영 ---
@@ -137,19 +136,21 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (!tabs[0]) return;
-
-          // 해당 탭에 content.js가 살아있는지 확인차 메시지 전송
-          chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" }, (response) => {
-            if (chrome.runtime.lastError) {
-              // 에러가 있다면 content.js가 로드되지 않은 것임 -> 새로고침 안내
-              console.error("Content script not responding. Please refresh the page.");
-              alert("페이지를 새로고침한 후 다시 시도해주세요!");
-            }
-          });
+        // 이미 활성화된 상태인지 확인
+        chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+          if (result.lumosDetectEnabled) {
+            // 이미 동의했다면 모달 없이 바로 전환
+            proceedToOnView();
+          } else {
+            // 처음 켜는 것이라면 모달 요청
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (!tabs[0]) return;
+              chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" });
+            });
+            // 모달 동의 전까지는 버튼을 다시 OFF 상태로 시각적 유지
+            this.checked = false;
+          }
         });
-        this.checked = false;
       }
     });
   }
