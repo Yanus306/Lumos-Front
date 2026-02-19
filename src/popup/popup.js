@@ -65,66 +65,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- [함수] 화면 전환 로직 ---
   function proceedToOnView() {
-    // --- [1단계] 토글 스위치만 먼저 ON으로 변경 ---
-    // 첫 번째 화면에 있는 체크박스를 체크하여 원이 이동하게 합니다.
-    if (toOnBtn) {
-        toOnBtn.checked = true;
-    }
+    // 이미 ON 화면이면 실행 안 함
+    if (viewOn.classList.contains('active')) return;
 
-    // 레이블 텍스트를 ON으로 변경 (위치 이동 애니메이션 포함)
+    console.log("🎬 애니메이션 시작 - 5초 대기");
+
+    if (toOnBtn) toOnBtn.checked = true;
     if (labelText) {
         labelText.textContent = "ON";
         labelText.style.left = "25px";
     }
-
     if (statusMsg) {
         statusMsg.textContent = "보호 활성화 중...";
     }
 
-    // --- [2단계] 첫 번째 화면 상태에서 '잠시 멈춤' ---
-    // 사용자가 스위치가 바뀐 것을 인지할 수 있도록 시간을 줍니다.
-    const pauseTime = 1000; // 💡 1초 동안 첫 화면 유지 (원하는 대로 조절하세요)
+    const pauseTime = 500; // 전환 지연 시간 (0.5초)
 
     setTimeout(() => {
-        // --- [3단계] 이제서야 두 번째 화면으로 전환 ---
-        // 1. 첫 번째 화면 페이드 아웃 시작
+        console.log("⌛ 5초 경과 - 화면 전환");
         viewOff.classList.remove('active');
 
-        // 2. CSS 트랜지션(0.4s)이 끝날 때쯤 두 번째 화면 등장
         setTimeout(() => {
             viewOn.classList.add('active');
-            
-            // 두 번째 화면의 상단 미니 토글도 ON 상태로 맞춰줌
             if (toOffBtn) toOffBtn.checked = true;
-            
-            if (statusMsg) {
-                statusMsg.textContent = "보호가 활성화됨";
-            }
-
-            // 게이지 로드
+            if (statusMsg) statusMsg.textContent = "보호가 활성화됨";
             fetchAndShowRisk();
-        }, 400); // .page-view의 transition 시간과 맞춤
-        
+        }, 400); 
     }, pauseTime);
   }
 
   // --- [로직] 1. 초기 상태 반영 ---
   chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
       if (result.lumosDetectEnabled) {
-          console.log("📡 스토리지에서 ON 상태 감지 - 화면 전환");
+          console.log("📡 ON 상태 감지 - 애니메이션 여부 확인");
           
-          // UI 요소들을 ON 상태로 즉시 변경
-          viewOff.classList.remove('active');
-          viewOn.classList.add('active');
-          if (toOnBtn) toOnBtn.checked = true;
-          if (toOffBtn) toOffBtn.checked = true; // ON 뷰 내의 토글도 ON으로
-          
-          if (labelText) {
-              labelText.textContent = "ON";
-              labelText.style.left = "25px";
+          // 현재 화면이 OFF 상태(view-off에 active가 있음)라면, 
+          // 팝업이 방금 열린 것이므로 애니메이션 함수를 호출합니다.
+          if (viewOff.classList.contains('active')) {
+              proceedToOnView(); 
+          } else {
+              // 이미 ON 화면이라면 (중복 방지) 즉시 UI 세팅
+              viewOff.classList.remove('active');
+              viewOn.classList.add('active');
+              if (toOnBtn) toOnBtn.checked = true;
+              if (toOffBtn) toOffBtn.checked = true;
+              if (labelText) {
+                  labelText.textContent = "ON";
+                  labelText.style.left = "25px";
+              }
+              fetchAndShowRisk();
           }
-          
-          fetchAndShowRisk(); 
       } else {
           viewOff.classList.add('active');
           viewOn.classList.remove('active');
