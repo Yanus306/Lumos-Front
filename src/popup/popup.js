@@ -11,39 +11,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- [함수] 위험 등급별 게이지 업데이트 ---
   function updateDonutGauge(score, status) {
     const meters = {
-      high: document.getElementById('meter-high'),
+      low: document.getElementById('meter-low'),
       mid: document.getElementById('meter-mid'),
-      low: document.getElementById('meter-low')
+      high: document.getElementById('meter-high')
     };
 
-    // 게이지 색상 초기화 (회색으로)
-    Object.values(meters).forEach(m => { 
-      if(m) m.style.setProperty('stroke', '#e0e0e2', 'important'); 
+    // 1. 모든 영역 초기화 (색상 리셋)
+    Object.values(meters).forEach(m => {
+      if (m) m.classList.remove('active');
     });
 
-    // 점수 구간별 색상 적용
+    // 2. 점수에 따른 등급 판별 및 활성화
     let currentLevel = 'low';
     if (score >= 66) {
       currentLevel = 'high';
-      if(meters.high) meters.high.style.setProperty('stroke', '#100252', 'important'); 
     } else if (score >= 33) {
       currentLevel = 'mid';
-      if(meters.mid) meters.mid.style.setProperty('stroke', '#6D62AA', 'important'); 
     } else {
       currentLevel = 'low';
-      if(meters.low) meters.low.style.setProperty('stroke', '#9B9AC4', 'important'); 
     }
 
-    // 화면 중앙에 "고위험" 등 텍스트 표시
+    // 3. 해당 영역에 active 클래스 추가 (색상 점등)
+    const targetMeter = meters[currentLevel];
+    if (targetMeter) {
+      targetMeter.classList.add('active');
+    }
+
+    // 중앙 텍스트 및 라벨 스타일 업데이트
     if (riskTitle) riskTitle.textContent = status;
     applyLabelStyles(currentLevel);
   }
 
+  // 에러 방지를 위해 fetchAndShowRisk 함수도 확실히 정의
   function fetchAndShowRisk() {
-    // 실제 서버가 없으니 임시 데이터 사용
+    // 임시 데이터 사용
     const mockBackendData = { score: 85, status: "고위험" };
-    
-    console.log("📊 게이지 업데이트 시작:", mockBackendData);
+    console.log("📊 UI 업데이트 데이터:", mockBackendData);
     updateDonutGauge(mockBackendData.score, mockBackendData.status);
   }
 
