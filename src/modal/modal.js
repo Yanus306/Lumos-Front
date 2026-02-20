@@ -13,17 +13,10 @@ const setupCheckboxLogic = (container) => {
             
             chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
                 setTimeout(() => {
-                    // 모달 제거
                     if (modalOverlay) {
                         modalOverlay.classList.add('lumos-hidden');
-                        // 애니메이션 후 아예 DOM에서 제거하고 싶다면 아래 주석 해제
-                        // setTimeout(() => modalOverlay.closest('#lumos-injected-modal').remove(), 400);
                     }
-                    
-                    // 팝업 업데이트용 메시지 전송
                     chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
-
-                    // 사용자에게 안내 알림창 띄우기
                     alert("✅ 동의가 완료되었습니다!\n확장 프로그램 팝업을 다시 열어 분석 결과를 확인해주세요.");
                 }, 300);
             });
@@ -31,6 +24,31 @@ const setupCheckboxLogic = (container) => {
     };
     checkboxes.forEach(cb => cb.addEventListener('change', handleCheck));
 };
+
+// policy data 불러오기 및 렌더링
+async function loadTexts() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('data/policy.json'));
+    const data = await response.json();
+
+    const privacyElem = document.getElementById('privacy-text');
+    const termsElem = document.getElementById('terms-text');
+
+    const buildHTML = (items) => {
+      return items.map(item => {
+        const className = item.isHeading === true ? 'lumos-heading' : 'lumos-body';
+        return `<div class="${className}">${item.text}</div>`;
+      }).join('');
+    };
+
+    if (privacyElem) privacyElem.innerHTML = buildHTML(data.privacyPolicy);
+    if (termsElem) termsElem.innerHTML = buildHTML(data.termsOfService);
+
+    console.log("✅ 약관 텍스트 주입 성공");
+  } catch (error) {
+    console.error("❌ 문구 로드 실패:", error);
+  }
+}
 
 // 모달 주입 함수
 const injectModal = () => {
@@ -69,33 +87,28 @@ const injectModal = () => {
     
     document.documentElement.appendChild(modalContainer);
 
-    // policy data 불러오기
     loadTexts();
-
     setupCheckboxLogic(modalContainer);
 };
 
-// 초기화 및 스토리지 감지 로직
+// 초기화 로직
 const initLumos = () => {
     chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
         if (result.lumosDetectEnabled === true) {
             console.log("🛡️ Lumos 보호 활성화 상태 (이미 동의함)");
-            // 여기서 모달 주입 대신 'AI 분석 시작' 함수 실행
         }
     });
 };
 
-// 페이지 로드 시 상태 확인
 if (document.readyState === 'complete') {
     initLumos();
 } else {
     window.addEventListener('load', initLumos);
 }
 
-// 스토리지 변경 감지 (다른 탭에서 OFF 했을 때 모달 제거 등)
+// 스토리지 변경 감지
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local' && changes.lumosDetectEnabled) {
-        // 기능이 꺼졌을 때만 모달 즉시 제거
         if (changes.lumosDetectEnabled.newValue === false) {
             const existingModal = document.querySelector('#lumos-injected-modal');
             if (existingModal) existingModal.remove();
@@ -112,19 +125,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     return true;
 });
-
-// policy data 불러오기
-async function loadTexts() {
-  try {
-    const response = await fetch(chrome.runtime.getURL('data/policy.json'));
-    const data = await response.json();
-
-    const privacyElem = document.getElementById('privacy-text');
-    const termsElem = document.getElementById('terms-text');
-
-    if (privacyElem) privacyElem.textContent = data.privacyPolicy.join('\n');
-    if (termsElem) termsElem.textContent = data.termsOfService.join('\n');
-  } catch (error) {
-    console.error("문구 로드 실패:", error);
-  }
-}

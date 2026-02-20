@@ -31,9 +31,23 @@
     
     overflow-y: auto; 
 
-    white-space: pre-wrap; 
+    white-space: normal; 
     line-height: 1.6;   
     text-align: left;
+}
+
+/* 제목 스타일 */
+.lumos-heading {
+    font-weight: bold;
+    font-size: 24px;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    color: #000;
+}
+
+/* 첫 줄이 제목일 경우 위쪽 여백 제거 */
+.policy-content-container div:first-child.lumos-heading {
+    margin-top: 0;
 }
 
 /* 1. 스크롤바 전체 너비를 설정 (여유 있게 잡아야 간격이 보입니다) */
