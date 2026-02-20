@@ -20,7 +20,8 @@
         "assets/*.svg", 
         "main-logo.svg", 
         "vite.svg",
-        "policy/*"
+        "policy/*", 
+        "data/policy.json"
       ],
       "matches": ["<all_urls>"]
     }

@@ -97,6 +97,10 @@
     background-color: #ffffff !important; 
     
     overflow-y: auto; 
+
+    white-space: pre-wrap; 
+    line-height: 1.6;   
+    text-align: left;
 }
 
 /* 스크롤 */

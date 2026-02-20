@@ -30,6 +30,10 @@
     border: 4px solid var(--main-color);
     
     overflow-y: auto; 
+
+    white-space: pre-wrap; 
+    line-height: 1.6;   
+    text-align: left;
 }
 
 /* 1. 스크롤바 전체 너비를 설정 (여유 있게 잡아야 간격이 보입니다) */

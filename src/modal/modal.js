@@ -47,7 +47,7 @@ const injectModal = () => {
                 <img src="${logoUrl}" class="lumos-modal-logo" alt="Lumos Logo">
                 <div class="lumos-modal-content-box">
                     <div class="lumos-modal-title">개인정보 처리방침</div>
-                    <div class="lumos-modal-content-container">사용자 개인정보 보호를 위한 안내 문구입니다.</div>
+                    <div class="lumos-modal-content-container" id="privacy-text">불러오는 중 ...</div>
                     <label class="lumos-modal-checkbox">
                         <input type="checkbox" class="lumos-check">
                         <span class="lumos-checkbox-mark"></span>
@@ -56,7 +56,7 @@ const injectModal = () => {
                 </div>
                 <div class="lumos-modal-content-box">
                     <div class="lumos-modal-title">이용약관</div>
-                    <div class="lumos-modal-content-container">서비스 이용 약관 내용입니다.</div>
+                    <div class="lumos-modal-content-container" id="terms-text">불러오는 중 ...</div>
                     <label class="lumos-modal-checkbox">
                         <input type="checkbox" class="lumos-check">
                         <span class="lumos-checkbox-mark"></span>
@@ -68,6 +68,10 @@ const injectModal = () => {
     `;
     
     document.documentElement.appendChild(modalContainer);
+
+    // policy data 불러오기
+    loadTexts();
+
     setupCheckboxLogic(modalContainer);
 };
 
@@ -108,3 +112,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     return true;
 });
+
+// policy data 불러오기
+async function loadTexts() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('data/policy.json'));
+    const data = await response.json();
+
+    const privacyElem = document.getElementById('privacy-text');
+    const termsElem = document.getElementById('terms-text');
+
+    if (privacyElem) privacyElem.textContent = data.privacyPolicy.join('\n');
+    if (termsElem) termsElem.textContent = data.termsOfService.join('\n');
+  } catch (error) {
+    console.error("문구 로드 실패:", error);
+  }
+}
