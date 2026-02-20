@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewOn = document.getElementById('view-on');
   const statusMsg = document.getElementById('status-msg');
   const labelText = document.querySelector('.center-layout .label-text');
-  const riskTitle = document.querySelector('.risk-title');
 
+  // --- [함수] 위험 등급별 게이지 업데이트 ---
   function updateDonutGauge(score, status) {
     const meters = {
       low: document.getElementById('meter-low'),
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (m) m.classList.remove('active');
     });
 
-    // 2. 점수에 따른 등급 판별
+    // 2. 점수에 따른 등급 판별 및 활성화
     let currentLevel = 'low';
     if (score >= 66) {
       currentLevel = 'high';
@@ -30,17 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
       currentLevel = 'low';
     }
 
-    // 3. 해당 영역 활성화 및 텍스트 업데이트
+    // 3. 해당 영역에 active 클래스 추가 (색상 점등)
     const targetMeter = meters[currentLevel];
     if (targetMeter) {
       targetMeter.classList.add('active');
     }
 
-    if (riskTitle) {
-      riskTitle.textContent = status;
-    }
-
     applyLabelStyles(currentLevel);
+  }
+
+  // 에러 방지를 위해 fetchAndShowRisk 함수도 확실히 정의
+  function fetchAndShowRisk() {
+    // 임시 데이터 사용
+    const mockBackendData = { score: 85, status: "고위험" };
+    console.log("📊 UI 업데이트 데이터:", mockBackendData);
+    updateDonutGauge(mockBackendData.score, mockBackendData.status);
   }
 
   function applyLabelStyles(activeLevel) {
@@ -61,74 +65,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 화면 업데이트 및 데이터 페칭
-  function fetchAndShowRisk() {
-    // 임시 데이터 사용 (추후 백엔드 연결 부위)
-    const mockBackendData = { score: 85, status: "고위험" };
-    console.log("📊 UI 업데이트 데이터:", mockBackendData);
-    updateDonutGauge(mockBackendData.score, mockBackendData.status);
-  }
-
-  // --- [함수] ON 뷰 전환 실행 ---
+  // --- [함수] 화면 전환 로직 ---
   function proceedToOnView() {
-    if (statusMsg) {
-      statusMsg.textContent = "보호가 활성화됨";
-      statusMsg.style.color = "#383838";
-    }
+    // 이미 ON 화면이면 실행 안 함
+    if (viewOn.classList.contains('active')) return;
 
+    console.log("🎬 애니메이션 시작 - 5초 대기");
+
+    if (toOnBtn) toOnBtn.checked = true;
     if (labelText) {
-      labelText.style.opacity = '0';
-      setTimeout(() => {
         labelText.textContent = "ON";
         labelText.style.left = "25px";
-        labelText.style.opacity = '1';
-      }, 200);
+    }
+    if (statusMsg) {
+        statusMsg.textContent = "보호 활성화 중...";
     }
 
+    const pauseTime = 500; // 전환 지연 시간 (0.5초)
+
     setTimeout(() => {
-      viewOff.classList.remove('active');
-      setTimeout(() => {
-        viewOn.classList.add('active'); 
-        if (toOffBtn) toOffBtn.checked = true;
-        fetchAndShowRisk();
-      }, 300);
-    }, 200);
+        console.log("⌛ 5초 경과 - 화면 전환");
+        viewOff.classList.remove('active');
+
+        setTimeout(() => {
+            viewOn.classList.add('active');
+            if (toOffBtn) toOffBtn.checked = true;
+            if (statusMsg) statusMsg.textContent = "보호가 활성화됨";
+            fetchAndShowRisk();
+        }, 400); 
+    }, pauseTime);
   }
 
   // --- [로직] 1. 초기 상태 반영 ---
   chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
-    if (result.lumosDetectEnabled) {
-      viewOff.classList.remove('active');
-      viewOn.classList.add('active');
-      if (toOnBtn) toOnBtn.checked = true;
-      if (toOffBtn) toOffBtn.checked = true;
-      
-      if (labelText) {
-        labelText.textContent = "ON";
-        labelText.style.left = "25px";
+      if (result.lumosDetectEnabled) {
+          console.log("📡 ON 상태 감지 - 애니메이션 여부 확인");
+          
+          // 현재 화면이 OFF 상태(view-off에 active가 있음)라면, 
+          // 팝업이 방금 열린 것이므로 애니메이션 함수를 호출합니다.
+          if (viewOff.classList.contains('active')) {
+              proceedToOnView(); 
+          } else {
+              // 이미 ON 화면이라면 (중복 방지) 즉시 UI 세팅
+              viewOff.classList.remove('active');
+              viewOn.classList.add('active');
+              if (toOnBtn) toOnBtn.checked = true;
+              if (toOffBtn) toOffBtn.checked = true;
+              if (labelText) {
+                  labelText.textContent = "ON";
+                  labelText.style.left = "25px";
+              }
+              fetchAndShowRisk();
+          }
+      } else {
+          viewOff.classList.add('active');
+          viewOn.classList.remove('active');
+          if (toOnBtn) toOnBtn.checked = false;
       }
-      fetchAndShowRisk(); 
-    } else {
-      viewOff.classList.add('active');
-      viewOn.classList.remove('active');
-      if (toOnBtn) toOnBtn.checked = false;
-    }
   });
 
   // --- [로직] 2. OFF -> ON 토글 클릭 ---
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0]) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" });
+        // 이미 활성화된 상태인지 확인
+        chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+          if (result.lumosDetectEnabled) {
+            // 이미 동의했다면 모달 없이 바로 전환
+            proceedToOnView();
+          } else {
+            // 처음 켜는 것이라면 모달 요청
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (!tabs[0]) return;
+              chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" });
+            });
+            // 모달 동의 전까지는 버튼을 다시 OFF 상태로 시각적 유지
+            this.checked = false;
           }
         });
-
-        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.set({ lumosDetectEnabled: true });
-        }
-        proceedToOnView();
       }
     });
   }
@@ -145,11 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (labelText) {
               labelText.textContent = "OFF";
               labelText.style.left = "55px";
-              labelText.style.opacity = '1';
-            }
-            if (statusMsg) {
-              statusMsg.textContent = "보호가 비활성화됨";
-              statusMsg.style.color = "#bbb";
             }
           }, 300);
         });
@@ -160,8 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- [로직] 4. 모달 완료 신호 수신 ---
   chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "MODAL_COMPLETE") {
-      console.log("✅ 모달 동의 완료 신호 수신");
-      fetchAndShowRisk();
+      console.log("✅ 모달 동의 확인됨. 스토리지 업데이트 및 화면 전환.");
+      
+      // 모달 동의 완료 시 스토리지에 ON 상태 저장
+      chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
+        if (toOnBtn) toOnBtn.checked = true;
+        proceedToOnView(); // 게이지 화면으로 전환하는 기존 함수 실행
+      });
     }
   });
 
