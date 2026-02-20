@@ -11,13 +11,20 @@ const setupCheckboxLogic = (container) => {
         if (allChecked) {
             console.log("✅ 모든 약관 동의 완료 - 스토리지 직접 업데이트");
             
-            // 1. 스토리지에 먼저 상태 저장 (팝업이 닫혀 있어도 데이터는 남음)
             chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
                 setTimeout(() => {
-                    if (modalOverlay) modalOverlay.classList.add('lumos-hidden');
+                    // 모달 제거
+                    if (modalOverlay) {
+                        modalOverlay.classList.add('lumos-hidden');
+                        // 애니메이션 후 아예 DOM에서 제거하고 싶다면 아래 주석 해제
+                        // setTimeout(() => modalOverlay.closest('#lumos-injected-modal').remove(), 400);
+                    }
                     
-                    // 2. 혹시나 팝업이 열려있을 경우를 위해 메시지 전송
+                    // 팝업 업데이트용 메시지 전송
                     chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
+
+                    // 사용자에게 안내 알림창 띄우기
+                    alert("✅ 동의가 완료되었습니다!\n확장 프로그램 팝업을 다시 열어 분석 결과를 확인해주세요.");
                 }, 300);
             });
         }
