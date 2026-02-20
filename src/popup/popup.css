@@ -1,4 +1,3 @@
-
 /* 기본 초기화 */
 * {
   margin: 0;
@@ -25,7 +24,7 @@ body {
   overflow: hidden;
 }
 
-/* [2] 페이지 전환 설정 */
+/* 페이지 전환 설정 */
 .page-view {
   position: absolute !important;
   top: 0 !important;
@@ -42,9 +41,7 @@ body {
   visibility: visible !important;
 }
 
-/* =========================================
-   [OFF 페이지]
-   ========================================= */
+/* --- OFF 페이지 스타일 --- */
 .center-layout {
   width: 100%;
   height: 100%;
@@ -64,10 +61,8 @@ body {
 
 .title {
   position: absolute;
-  left: 87;
   top: 241px;
   width: 100%;
-  height: 38;
   font-size: 32px;
   font-weight: 620;
   color: #383838;
@@ -77,7 +72,6 @@ body {
 
 .description {
   position: absolute;
-  left: 0px;
   top: 289px;
   width: 100%;
   font-size: 18px;
@@ -85,12 +79,10 @@ body {
   color: #919191;
   text-align: center;
   line-height: 1.2;
-  letter-spacing: -0.02em;
 }
 
 .status-text {
   position: absolute;
-  left: 0;
   top: 350px;
   width: 100%;
   font-size: 12px;
@@ -99,7 +91,7 @@ body {
   transition: 0.3s;
 }
 
-/* [3] 메인 토글 버튼 (OFF) */
+/* 메인 토글 버튼 */
 .center-layout .toggle-btn {
   position: absolute;
   left: 117px;
@@ -117,17 +109,10 @@ body {
   transition: background-color 0.4s ease;
 }
 
-/* 체크 안됐을 때 (OFF) 배경색 강제 */
-#to-on-btn:not(:checked) + .slider {
-  background-color: #dedede !important;
-}
-
-/* 체크 됐을 때 (ON) 배경색 변경 */
 #to-on-btn:checked + .slider {
   background-color: #011139 !important;
 }
 
-/* 토글 흰색 원 */
 .slider:before {
   content: "";
   position: absolute;
@@ -142,12 +127,10 @@ body {
   z-index: 2;
 }
 
-/* 체크 시 원 이동 */
 #to-on-btn:checked + .slider:before {
   transform: translateX(71px);
 }
 
-/* 토글 내부 텍스트 */
 .center-layout .label-text {
   position: absolute;
   left: 55px;
@@ -156,13 +139,11 @@ body {
   color: #fff;
   font-size: 16px;
   font-weight: 300;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
   z-index: 1;
 }
 
-/* =========================================
-   [ON 페이지]
-   ========================================= */
+/* --- ON 페이지 스타일 --- */
 .logo-mini {
   position: absolute;
   left: 36px;
@@ -178,10 +159,8 @@ body {
   top: 59px;
   width: 70px;
   height: 27px;
-  cursor: pointer;
 }
 
-/* 미니 토글 배경 */
 .slider-on {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -202,44 +181,35 @@ body {
   transition: transform 0.4s ease-in-out;
 }
 
-/* ON 상태 원 위치 */
+.top-header .label-text {
+  position: absolute;
+  left: 18px; 
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff !important;
+  font-size: 12px;
+  z-index: 1;
+}
+
 #to-off-btn:checked + .slider-on:before {
   transform: translateX(40px);
 }
 
-/* 돌아올 때 배경색 복구 */
-#to-off-btn:not(:checked) + .slider-on {
-  background-color: #dedede !important;
-}
-
-#text-p2.label-text {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: white;
-  font-size: 12px;
-  font-weight: 330;
-  z-index: 1;
-}
-
 .title-mini {
   position: absolute;
-  left: 0;
-  top: 111px;
+  top: 105px;
   width: 100%;
   text-align: center;
   font-size: 32px;
   font-weight: 680;
-  letter-spacing: -0.02em;
   color: #383838;
 }
 
-/* [4] 도넛 차트 레이아웃 */
+/* 도넛 차트 핵심 스타일 */
 .chart-container {
   position: absolute;
   left: 50%;
-  top: 280px; 
+  top: 265px; 
   transform: translate(-50%, -50%); 
   width: 195.5px; 
   height: 230.37px;
@@ -253,38 +223,73 @@ body {
   height: 190px;
 }
 
+/* 모든 원 공통 속성 */
 .donut-svg circle {
   fill: none;
   stroke-width: 30 !important;
-  stroke-linecap: butt;
 }
 
-.chart-bg { stroke: #e0e0e2; }
+.chart-bg { 
+  stroke: transparent; /* 또는 display: none; */
+}
 
-/* 고위험 게이지 기본 애니메이션 */
+/* 게이지 공통 스타일 */
+.meter {
+  fill: none;
+  stroke-width: 30 !important;
+  stroke: #D6D6D9;
+  
+  stroke-dasharray: 71.2 213.6; 
+  stroke-linecap: butt !important; 
+  
+  transition: stroke 0.4s ease;
+  transform-origin: center;
+}
+
+/* 저위험 (왼쪽: 8시~12시 방향) */
+.meter.low {
+  transform: rotate(152deg); 
+}
+
+/* 중위험 (하단: 4시~8시 방향) */
+.meter.mid {
+  transform: rotate(32deg);
+}
+
+/* 고위험 (오른쪽: 12시~4시 방향) */
 .meter.high {
-  stroke: #011139;
-  stroke-dasharray: 0 213.6; 
-  transition: stroke-dasharray 0.8s ease-out; 
+  transform: rotate(-88deg);
 }
 
-/* 내부 가이드 라벨 */
+/* 활성화 시 색상 (JS에서 클래스를 추가할 예정) */
+.meter.low.active { stroke: #9B9AC4 !important; }
+.meter.mid.active { stroke: #6D62AA !important; }
+.meter.high.active { stroke: #100252 !important; }
+
+/* 가이드 라벨 */
 .guide-label {
   position: absolute;
-  font-size: 13px;
-  font-weight: 500 !important;
+  font-size: 14px;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
-  pointer-events: none;
+  color: white !important;
+  opacity: 0.4; /* 비활성 상태 기본 투명도 */
+  transition: opacity 0.3s, color 0.3s;
 }
-.guide-label.high { top: 37%; left: 79%; color: #383838; }
-.guide-label.low { top: 37%; left: 22%; color: #383838; }
-.guide-label.mid { top: 77%; left: 50%; color: #383838; }
+
+.guide-label.high { top: 37%; left: 79%; }
+.guide-label.low { top: 37%; left: 22%; }
+.guide-label.mid { top: 77%; left: 50%; }
+
+.guide-label.active {
+  color: #ffffff !important;
+  opacity: 1;
+  font-weight: bold;
+}
 
 .risk-title {
   position: absolute;
   left: 50%; 
-  top: 402.83px; 
+  top: 385px; 
   transform: translateX(-50%);
   font-size: 24px;   
   font-weight: 700;  
@@ -292,7 +297,26 @@ body {
   text-align: center;
 }
 
-/* 체크박스 숨김 */
 input[type="checkbox"] {
   display: none !important;
+}
+
+.policy-container {
+  position: absolute;
+  bottom: 50px; 
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+/* 개별 링크 스타일 (span) */
+.policy-link {
+  font-size: 12px;
+  color: #919191;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s, color 0.2s;
 }

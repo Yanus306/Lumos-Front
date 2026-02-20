@@ -10,30 +10,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateDonutGauge(score, status) {
     const meters = {
-      high: document.getElementById('meter-high'),
+      low: document.getElementById('meter-low'),
       mid: document.getElementById('meter-mid'),
-      low: document.getElementById('meter-low')
+      high: document.getElementById('meter-high')
     };
 
-    // 초기화 (전체 회색)
-    Object.values(meters).forEach(m => { 
-      if(m) m.style.setProperty('stroke', '#e0e0e2', 'important'); 
+    // 1. 모든 영역 초기화 (색상 리셋)
+    Object.values(meters).forEach(m => {
+      if (m) m.classList.remove('active');
     });
 
-    // 점수 구간별 색상 적용
+    // 2. 점수에 따른 등급 판별
     let currentLevel = 'low';
     if (score >= 66) {
       currentLevel = 'high';
-      if(meters.high) meters.high.style.setProperty('stroke', '#100252', 'important'); 
     } else if (score >= 33) {
       currentLevel = 'mid';
-      if(meters.mid) meters.mid.style.setProperty('stroke', '#6D62AA', 'important'); 
     } else {
       currentLevel = 'low';
-      if(meters.low) meters.low.style.setProperty('stroke', '#9B9AC4', 'important'); 
     }
 
-    if (riskTitle) riskTitle.textContent = status;
+    // 3. 해당 영역 활성화 및 텍스트 업데이트
+    const targetMeter = meters[currentLevel];
+    if (targetMeter) {
+      targetMeter.classList.add('active');
+    }
+
+    if (riskTitle) {
+      riskTitle.textContent = status;
+    }
+
     applyLabelStyles(currentLevel);
   }
 
@@ -42,24 +48,28 @@ document.addEventListener('DOMContentLoaded', () => {
     levels.forEach(level => {
       const label = document.getElementById(`txt-${level}`);
       if (label) {
+        label.style.color = '#ffffff';
+        
         if (level === activeLevel) {
-          label.style.setProperty('color', '#ffffff', 'important');
-          label.style.opacity = "1";
+          label.style.fontWeight = '800';
+          label.style.opacity = "1";  
         } else {
-          label.style.setProperty('color', '#383838', 'important');
-          label.style.opacity = "0.4";
+          label.style.fontWeight = '400'; 
+          label.style.opacity = "1";
         }
       }
     });
   }
 
-  // --- [함수] 화면 전환 로직 ---
+  // 화면 업데이트 및 데이터 페칭
   function fetchAndShowRisk() {
+    // 임시 데이터 사용 (추후 백엔드 연결 부위)
     const mockBackendData = { score: 85, status: "고위험" };
+    console.log("📊 UI 업데이트 데이터:", mockBackendData);
     updateDonutGauge(mockBackendData.score, mockBackendData.status);
   }
 
-  // [함수] ON 뷰 전환 실행 (사용자 원본 로직 유지)
+  // --- [함수] ON 뷰 전환 실행 ---
   function proceedToOnView() {
     if (statusMsg) {
       statusMsg.textContent = "보호가 활성화됨";
@@ -105,11 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- [로직] 2. OFF -> ON 토글 클릭 (원본 유지) ---
+  // --- [로직] 2. OFF -> ON 토글 클릭 ---
   if (toOnBtn) {
     toOnBtn.addEventListener('change', function() {
       if (this.checked) {
-        // 모달 요청을 보내되, 팝업 화면은 바로 ON 뷰로 넘기도록 유지
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (tabs[0]) {
             chrome.tabs.sendMessage(tabs[0].id, { action: "SHOW_MODAL" });
@@ -124,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- [로직] 3. ON -> OFF 토글 클릭 (원본 유지) ---
+  // --- [로직] 3. ON -> OFF 토글 클릭 ---
   if (toOffBtn) {
     toOffBtn.addEventListener('change', function() {
       if (!this.checked) {
@@ -152,7 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "MODAL_COMPLETE") {
       console.log("✅ 모달 동의 완료 신호 수신");
-      // 필요 시 추가 로직 작성 가능
+      fetchAndShowRisk();
     }
   });
+
+  // --- [로직] 5. 정책 및 약관 링크 클릭 시 새 탭 열기 ---
+  const policyLink = document.querySelector('.policy-link');
+  if (policyLink) {
+    policyLink.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('policy/policy.html')});
+    });
+  }
 });
