@@ -179,4 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+
+  // --- [로직] 5. 정책 및 약관 링크 클릭 시 새 탭 열기 ---
+  const policyLink = document.querySelector('.policy-link');
+  if (policyLink) {
+    policyLink.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('policy/policy.html')});
+    });
+  }
 });
