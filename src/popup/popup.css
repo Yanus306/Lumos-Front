@@ -259,10 +259,9 @@ body {
 /* 가이드 라벨 */
 .guide-label {
   position: absolute;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
   transform: translate(-50%, -50%);
-  color: #383838;
+  color: white !important;
   opacity: 0.4; /* 비활성 상태 기본 투명도 */
   transition: opacity 0.3s, color 0.3s;
 }
@@ -270,6 +269,12 @@ body {
 .guide-label.high { top: 37%; left: 79%; }
 .guide-label.low { top: 37%; left: 22%; }
 .guide-label.mid { top: 77%; left: 50%; }
+
+.guide-label.active {
+  color: #ffffff !important;
+  opacity: 1;
+  font-weight: bold;
+}
 
 .risk-title {
   position: absolute;

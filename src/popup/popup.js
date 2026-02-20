@@ -55,12 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     levels.forEach(level => {
       const label = document.getElementById(`txt-${level}`);
       if (label) {
+        label.style.color = '#ffffff';
+        
         if (level === activeLevel) {
-          label.style.setProperty('color', '#ffffff', 'important');
-          label.style.opacity = "1";
+          label.style.fontWeight = '800';
+          label.style.opacity = "1";  
         } else {
-          label.style.setProperty('color', '#383838', 'important');
-          label.style.opacity = "0.4";
+          label.style.fontWeight = '400'; 
+          label.style.opacity = "1";
         }
       }
     });
