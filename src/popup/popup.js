@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewOn = document.getElementById('view-on');
   const statusMsg = document.getElementById('status-msg');
   const labelText = document.querySelector('.center-layout .label-text');
-  const riskTitle = document.querySelector('.risk-title');
 
   // --- [함수] 위험 등급별 게이지 업데이트 ---
   function updateDonutGauge(score, status) {
@@ -37,8 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
       targetMeter.classList.add('active');
     }
 
-    // 중앙 텍스트 및 라벨 스타일 업데이트
-    if (riskTitle) riskTitle.textContent = status;
     applyLabelStyles(currentLevel);
   }
 
