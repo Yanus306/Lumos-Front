@@ -16,7 +16,7 @@ export default defineConfig({
         header_style: resolve(__dirname, 'src/policy/header.css'),
         policy_style: resolve(__dirname, 'src/policy/policy.css'),
         policy: resolve(__dirname, 'src/policy/policy.html'),
-        
+     
         // [수정] src/detector 안에 있는 파일들을 명시적으로 추가
         overlay: resolve(__dirname, 'src/detector/overlay.js'),
         scanner: resolve(__dirname, 'src/detector/scanner.js'),
