@@ -1,0 +1,10 @@
+/* 탐지된 요소에 입힐 기본 스타일 */
+.lumos-detected {
+    transition: all 0.3s ease-in-out !important;
+    position: relative !important;
+}
+
+/* 마우스를 올렸을 때 살짝 더 진해지는 효과 (선택사항) */
+.lumos-detected:hover {
+    background-color: rgba(255, 77, 77, 0.1) !important;
+}
