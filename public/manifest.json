@@ -6,6 +6,11 @@
   "action": {
     "default_popup": "popup/popup.html"
   },
+  "host_permissions": [
+    "https://*.google.com/*",
+    "https://*.google.co.kr/*",
+    "https://*.gstatic.com/*" 
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
