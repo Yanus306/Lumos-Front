@@ -59,10 +59,9 @@
 }
 
 .lumos-modal-logo {
-    width: 102px;
-    height: 106px;
-
-    box-shadow: 14px 9px 12.7px 0px rgba(58, 171, 251, 0.25);
+    width: 126px;
+    height: 132px;
+    margin-left: 10px;
 }
 
 .lumos-modal-content-box {
