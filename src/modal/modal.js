@@ -34,15 +34,20 @@ async function loadTexts() {
     const privacyElem = document.getElementById('privacy-text');
     const termsElem = document.getElementById('terms-text');
 
-    const buildHTML = (items) => {
-      return items.map(item => {
-        const className = item.isHeading === true ? 'lumos-heading' : 'lumos-body';
-        return `<div class="${className}">${item.text}</div>`;
-      }).join('');
+    // buildHTML 함수를 아래와 같이 안전한 방식으로 변경
+    const buildSafeDOM = (container, items) => {
+        container.innerHTML = ''; // 초기화
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = item.isHeading ? 'lumos-heading' : 'lumos-body';
+            div.textContent = item.text;
+            container.appendChild(div);
+        });
     };
 
-    if (privacyElem) privacyElem.innerHTML = buildHTML(data.privacyPolicy);
-    if (termsElem) termsElem.innerHTML = buildHTML(data.termsOfService);
+    // loadTexts 함수 내부 수정
+    if (privacyElem) buildSafeDOM(privacyElem, data.privacyPolicy);
+    if (termsElem) buildSafeDOM(termsElem, data.termsOfService);
 
     console.log("✅ 약관 텍스트 주입 성공");
   } catch (error) {
