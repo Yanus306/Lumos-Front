@@ -7,6 +7,8 @@
     "default_popup": "popup/popup.html"
   },
   "host_permissions": [
+    "https://lumos.jongyeol.kr/*", 
+    "https://*/*", 
     "https://*.google.com/*",
     "https://*.google.co.kr/*",
     "https://*.gstatic.com/*"
@@ -14,11 +16,20 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["modal/modal.js", "detector/overlay.js", "detector/scanner.js"],
+      "js": [
+        "detector/config.js",
+        "detector/capture.js", 
+        "detector/overlay.js",
+        "detector/scanner.js",
+        "modal/modal.js"
+      ], 
       "css": ["common.css", "modal/modal.css"],
       "run_at": "document_end"
     }
   ],
+  "background": {
+    "service_worker": "background.js" 
+  },
   "web_accessible_resources": [
     {
       "resources": [

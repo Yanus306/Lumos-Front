@@ -16,17 +16,22 @@ export default defineConfig({
         header_style: resolve(__dirname, "src/policy/header.css"),
         policy_style: resolve(__dirname, "src/policy/policy.css"),
         policy: resolve(__dirname, "src/policy/policy.html"),
-
-        // [수정] src/detector 안에 있는 파일들을 명시적으로 추가
         overlay: resolve(__dirname, "src/detector/overlay.js"),
         scanner: resolve(__dirname, "src/detector/scanner.js"),
+        config: resolve(__dirname, "src/detector/config.js"),
+        capture: resolve(__dirname, "src/detector/capture.js"),
       },
       output: {
-        // JS 파일들이 각자 폴더에 들어가도록 설정
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === "overlay" || chunkInfo.name === "scanner") {
+      entryFileNames: (chunkInfo) => {
+          const detectorFiles = ["overlay", "scanner", "config", "capture"];
+          if (detectorFiles.includes(chunkInfo.name)) {
             return "detector/[name].js";
           }
+          
+          if (chunkInfo.name === "background") {
+            return "background/[name].js";
+          }
+
           return "[name]/[name].js";
         },
         assetFileNames: (assetInfo) => {

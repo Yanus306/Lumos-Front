@@ -1,56 +1,86 @@
-// 하이라이트 실행 함수
-const startAnalysis = async () => { // API 호출(fetch)을 대비해 async를 추가했습니다.
-    // 이미 박스가 있으면 중복 생성 방지
+const startAnalysis = async () => { 
     if (document.querySelector('.lumos-ai-highlight')) return;
 
     console.log("🎯 [Lumos] 분석 및 하이라이트 생성");
 
     // =========================================================
-    //Mock Data 사용
+    // Mock Data 사용 (현재 주석 처리됨)
     // =========================================================
-    const mockData = [{ x: 150, y: 100, width: 200, height: 150 }];
+    /*
+    const mockData = [{ x: 500, y: 420, width: 400, height: 600 }];
     
-    if (window.applyAiHighlight) {
+    if (typeof window.applyAiHighlight === 'function') {
         window.applyAiHighlight(mockData);
+    } else {
+        console.error("❌ 에러: applyAiHighlight 함수를 찾을 수 없습니다.");
     }
+    */
 
-    /* =========================================================
-    //실제 API 연동 (나중에 주소 나오면 주석 해제)
+    // =========================================================
+    // 실제 API 연동 (캡쳐 기능 포함)
     // =========================================================
     try {
-        const API_URL = "https://나중에 넣을 주소.com/api/detect"; 
-        
+        console.log("📸 [Lumos] 화면 캡쳐 요청 중...");
+        const imageBlob = await window.lumosCapture.takeScreenshot();
+
+        // const imageBlob = base64ToBlob(base64Image);
+
+        // [추가] 데이터가 제대로 생성되었는지, 길이는 어느 정도인지 확인
+        // console.log("📏 이미지 데이터 길이:", base64Image.length);
+        // console.log("📄 이미지 데이터 앞부분:", base64Image.substring(0, 50));
+
+        console.log("🚀 [Lumos] BE로 이미지 및 데이터 전송 중...");
+        const API_URL = `https://lumos.jongyeol.kr/check`; 
+
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: window.location.href })
+            headers: { 'Content-Type': 'image/jpeg' },
+            body: imageBlob
         });
         
         const data = await response.json(); 
 
-        // 서버가 알려준 요소(selector)를 찾아 실제 좌표(DOM) 계산
-        const highlights = data.map(item => {
-            const el = document.querySelector(item.selector); 
-            if (!el) return null;
-            const rect = el.getBoundingClientRect();
-            return {
-                x: rect.left + window.scrollX,
-                y: rect.top + window.scrollY,
-                width: rect.width,
-                height: rect.height
-            };
-        }).filter(item => item !== null);
+        // 서버 응답 처리
+        // 만약 서버가 직접 x, y 좌표를 준다면 map 과정 없이 바로 applyAiHighlight로 넘겨도 됩니다.
+        let highlights = [];
+        
+        if (data.predictions) {
+            // 서버가 selector 정보를 준 경우 좌표로 변환
+            highlights = data.predictions.map(item => {
+                if (item.selector) {
+                    const el = document.querySelector(item.selector); 
+                    if (!el) return null;
+                    const rect = el.getBoundingClientRect();
+                    return {
+                        x: rect.left + window.scrollX,
+                        y: rect.top + window.scrollY,
+                        width: rect.width,
+                        height: rect.height
+                    };
+                }
+                // 서버가 이미 좌표값(x, y)을 계산해서 준 경우 그대로 사용
+                return item; 
+            }).filter(item => item !== null);
+        }
 
         if (window.applyAiHighlight && highlights.length > 0) {
-            // API 데이터가 성공적으로 오면 기존 mockData 하이라이트를 지우고 교체 가능
-            // window.clearAiHighlight();
-            // window.applyAiHighlight(highlights);
+            // API 데이터가 성공적으로 오면 하이라이트 실행
+            window.applyAiHighlight(highlights);
         }
     } catch (error) {
-        console.error("❌ API 분석 실패:", error);
+        console.error("❌ [Lumos] API 분석 실패:", error);
     }
-    ========================================================= */
 };
+
+const base64ToBlob = (base64) => {
+    const byteString = atob(base64.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: 'image/jpeg' });
+}
 
 // 하이라이트 제거 함수
 const stopAnalysis = () => {
