@@ -10,27 +10,28 @@ const setupCheckboxLogic = (container) => {
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         
         if (allChecked) {
-            // 1. 알림창 표시 (사용자가 확인을 누를 때까지 아래 코드는 실행되지 않음)
-            alert("✅ 동의가 완료되었습니다!\n확인 버튼을 누르면 분석이 시작됩니다.");
+            setTimeout(() => {
+                // 알림창 표시
+                alert("✅ 동의가 완료되었습니다!\n확인 버튼을 누르면 분석이 시작됩니다.");
 
-            // 2. 사용자가 '확인'을 누른 후 실행됨: 모달 제거
-            const modalElement = document.querySelector('#lumos-injected-modal');
-            if (modalElement) {
-                modalElement.remove();
-                console.log("🗑️ 모달 제거 완료");
-            }
-
-            // 3. 스토리지 저장 및 분석 즉시 시작
-            chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
-                console.log("📸 [Lumos] 동의 완료 후 첫 분석 시작");
-                
-                // scanner.js에 정의된 startAnalysis 호출
-                if (typeof startAnalysis === 'function') {
-                    startAnalysis(); 
-                } else {
-                    chrome.runtime.sendMessage({ action: "START_SCAN" });
+                // 모달 제거
+                const modalElement = document.querySelector('#lumos-injected-modal');
+                if (modalElement) {
+                    modalElement.remove();
+                    console.log("🗑️ 모달 제거 완료");
                 }
-            });
+
+                // 스토리지 저장 및 분석 시작
+                chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
+                    console.log("📸 [Lumos] 동의 완료 후 첫 분석 시작");
+                    
+                    if (typeof startAnalysis === 'function') {
+                        startAnalysis(); 
+                    } else {
+                        chrome.runtime.sendMessage({ action: "START_SCAN" });
+                    }
+                });
+            }, 100);
         }
     };
     checkboxes.forEach(cb => cb.addEventListener('change', handleCheck));
