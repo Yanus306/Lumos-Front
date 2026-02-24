@@ -71,7 +71,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
 }
 
 .lumos-modal-title {
@@ -156,14 +155,18 @@
 }
 
 .lumos-modal-checkbox {
-  width: 113px;
+  width: auto;
   height: 24px;
+  margin: 0 auto;
 
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 12px;
 
   cursor: pointer;
+
+  background-color: aqua;
 }
 
 .lumos-checkbox-mark {
