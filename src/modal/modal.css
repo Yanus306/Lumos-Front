@@ -36,12 +36,17 @@
 }
 
 .lumos-modal-container {
+  position: relative;
+  z-index: 1;
+
   width: 766px !important;
   height: 721px !important;
+  padding-bottom: 24px !important; 
+  box-sizing: border-box !important;
 
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
+  justify-content: flex-end !important;
   align-items: center !important;
   z-index: 2147483648 !important;
 
@@ -59,9 +64,13 @@
 }
 
 .lumos-modal-logo {
+  position: absolute;
+  top: 29px;
+  left: 332px;
+  z-index: 10;
+
   width: 126px;
   height: 132px;
-  margin-left: 10px;
 }
 
 .lumos-modal-content-box {
@@ -165,8 +174,6 @@
   gap: 12px;
 
   cursor: pointer;
-
-  background-color: aqua;
 }
 
 .lumos-checkbox-mark {
