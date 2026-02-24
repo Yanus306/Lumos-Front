@@ -23,48 +23,41 @@ const startAnalysis = async () => {
         console.log("📸 [Lumos] 화면 캡쳐 요청 중...");
         const imageBlob = await window.lumosCapture.takeScreenshot();
 
-        // const imageBlob = base64ToBlob(base64Image);
-
-        // [추가] 데이터가 제대로 생성되었는지, 길이는 어느 정도인지 확인
-        // console.log("📏 이미지 데이터 길이:", base64Image.length);
-        // console.log("📄 이미지 데이터 앞부분:", base64Image.substring(0, 50));
-
-        console.log("🚀 [Lumos] BE로 이미지 및 데이터 전송 중...");
-        const API_URL = `https://lumos.jongyeol.kr/check`; 
-
-        const response = await fetch(API_URL, {
+        console.log("🚀 [Lumos] BE로 데이터 전송 중...");
+        const response = await fetch(`https://lumos.jongyeol.kr/check`, {
             method: 'POST',
             headers: { 'Content-Type': 'image/jpeg' },
             body: imageBlob
         });
         
         const data = await response.json(); 
+        console.log("📦 [Lumos] 서버 응답 원본:", data); // 서버가 준 쌩 데이터를 확인
 
-        // 서버 응답 처리
-        // 만약 서버가 직접 x, y 좌표를 준다면 map 과정 없이 바로 applyAiHighlight로 넘겨도 됩니다.
-        let highlights = [];
-        
-        if (data.predictions) {
-            // 서버가 selector 정보를 준 경우 좌표로 변환
-            highlights = data.predictions.map(item => {
-                if (item.selector) {
-                    const el = document.querySelector(item.selector); 
-                    if (!el) return null;
-                    const rect = el.getBoundingClientRect();
-                    return {
-                        x: rect.left + window.scrollX,
-                        y: rect.top + window.scrollY,
-                        width: rect.width,
-                        height: rect.height
-                    };
-                }
-                // 서버가 이미 좌표값(x, y)을 계산해서 준 경우 그대로 사용
-                return item; 
-            }).filter(item => item !== null);
+        if (!Array.isArray(data) || data.length === 0) {
+            console.log("✅ [Lumos] 검출된 다크 패턴이 없습니다.");
+            return;
         }
 
-        if (window.applyAiHighlight && highlights.length > 0) {
-            // API 데이터가 성공적으로 오면 하이라이트 실행
+        const highlights = data.map(item => {
+            // 좌표 값이 숫자인지 꼭 확인해야 합니다.
+            const x = Number(item.rect[0]) + window.scrollX;
+            const y = Number(item.rect[1]) + window.scrollY;
+            
+            return {
+                x: x,
+                y: y,
+                width: Number(item.rect[2]),
+                height: Number(item.rect[3]),
+                type: item.patternType, 
+                riskLevel: item.risk.level,
+                score: item.risk.score 
+            };
+        });
+
+        // 표 형태로 깔끔하게 로그 출력 (X, Y 좌표가 0이 아닌지 확인 가능)
+        console.table(highlights); 
+
+        if (window.applyAiHighlight) {
             window.applyAiHighlight(highlights);
         }
     } catch (error) {
