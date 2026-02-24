@@ -10,29 +10,25 @@ const setupCheckboxLogic = (container) => {
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         
         if (allChecked) {
-            // 1. 알림창 표시
+            // 1. 알림창 표시 (사용자가 확인을 누를 때까지 아래 코드는 실행되지 않음)
             alert("✅ 동의가 완료되었습니다!\n확인 버튼을 누르면 분석이 시작됩니다.");
 
-            // 2. 모달 제거
+            // 2. 사용자가 '확인'을 누른 후 실행됨: 모달 제거
             const modalElement = document.querySelector('#lumos-injected-modal');
             if (modalElement) {
                 modalElement.remove();
                 console.log("🗑️ 모달 제거 완료");
             }
 
-            // 3. 스토리지 저장 후 실행
+            // 3. 스토리지 저장 및 분석 즉시 시작
             chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
-                console.log("📸 [Lumos] 스토리지 업데이트 완료");
-
-                // 메시지도 보내고, 직접 함수 실행도 시도합니다 (가장 확실한 방법)
+                console.log("📸 [Lumos] 동의 완료 후 첫 분석 시작");
+                
+                // scanner.js에 정의된 startAnalysis 호출
                 if (typeof startAnalysis === 'function') {
-                    console.log("🎯 [Lumos] 직접 startAnalysis 실행");
-                    setTimeout(startAnalysis, 500); 
+                    startAnalysis(); 
                 } else {
-                    console.log("📨 [Lumos] 메시지 방식으로 스캔 요청");
-                    setTimeout(() => {
-                        chrome.runtime.sendMessage({ action: "START_SCAN" });
-                    }, 500);
+                    chrome.runtime.sendMessage({ action: "START_SCAN" });
                 }
             });
         }
