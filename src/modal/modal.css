@@ -1,212 +1,212 @@
 #lumos-injected-modal * {
-    filter: none !important;
-    -webkit-filter: none !important;
-    opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
 }
 
 /* 모달 전체를 감싸는 최상위 컨테이너 */
 #lumos-injected-modal {
-    all: initial !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 2147483647 !important; 
+  all: initial !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 2147483647 !important;
 
-    width: 100vw !important;
-    height: 100vh !important;
+  width: 100vw !important;
+  height: 100vh !important;
 
-    display: block !important;
+  display: block !important;
 }
 
 /* 모달 배경 (어둡게) */
 .lumos-modal-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
 
-    width: 100% !important;
-    height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 
-    background: rgba(0, 0, 0, 0.7) !important;
-    isolation: isolate !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  isolation: isolate !important;
 }
 
 .lumos-modal-container {
-    width: 766px !important;
-    height: 721px !important;
-    
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    z-index: 2147483648 !important;
-    
-    /* 변수(var) 대신 실제 색상 코드 */
-    background-color: #ffffff !important; 
-    color: #383838 !important;
-    
-    border-radius: 20px !important;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.5) !important;
+  width: 766px !important;
+  height: 721px !important;
 
-    opacity: 1 !important;
-    visibility: visible !important; /* 추가 */
-    filter: none !important;
-    backdrop-filter: none !important; /* 일부 사이트 간섭 방지 */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 2147483648 !important;
+
+  /* 변수(var) 대신 실제 색상 코드 */
+  background-color: #ffffff !important;
+  color: #383838 !important;
+
+  border-radius: 20px !important;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5) !important;
+
+  opacity: 1 !important;
+  visibility: visible !important; /* 추가 */
+  filter: none !important;
+  backdrop-filter: none !important; /* 일부 사이트 간섭 방지 */
 }
 
 .lumos-modal-logo {
-    width: 126px;
-    height: 132px;
-    margin-left: 10px;
+  width: 126px;
+  height: 132px;
+  margin-left: 10px;
 }
 
 .lumos-modal-content-box {
-    width: 701px;
-    height: 278px;
+  width: 701px;
+  height: 278px;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .lumos-modal-title {
-    font-size: 20px;
-    font-weight: bold;
+  font-size: 20px;
+  font-weight: bold;
 
-    margin-left: 11px;
-    margin-right: auto;
+  margin-left: 11px;
+  margin-right: auto;
 
-    color: var(--font1-color);
+  color: var(--font1-color);
 }
 
 .lumos-modal-content-container {
-    width: 701px;
-    height: 213px;
-    padding: 18px 36px;
-    border-radius: 10px;
+  width: 701px;
+  height: 213px;
+  padding: 18px 36px;
+  border-radius: 10px;
 
-    border: 2px solid #01123D !important; 
-    color: #383838 !important;
-    font-size: 12px;
-    background-color: #ffffff !important; 
-    
-    overflow-y: auto; 
+  border: 2px solid #01123d !important;
+  color: #383838 !important;
+  font-size: 12px;
+  background-color: #ffffff !important;
 
-    white-space: pre-wrap; 
-    line-height: 1.6;   
-    text-align: left;
+  overflow-y: auto;
+
+  white-space: pre-wrap;
+  line-height: 1.6;
+  text-align: left;
 }
 
 /* 기존의 pre-wrap 설정이 있다면 normal로 초기화 (div 줄바꿈 사용을 위해) */
 #lumos-injected-modal .lumos-modal-content-container {
-    white-space: normal !important;
+  white-space: normal !important;
 }
 
 /* 제목 스타일: 반드시 !important를 붙여서 기존 설정을 덮어씁니다 */
 #lumos-injected-modal .lumos-heading {
-    display: block !important;
-    font-weight: bold !important;
-    font-size: 14px !important;
-    color: #000 !important;
-    margin-top: 16px !important;
-    margin-bottom: 6px !important;
+  display: block !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  color: #000 !important;
+  margin-top: 16px !important;
+  margin-bottom: 6px !important;
 }
 
 /* 본문 스타일: 기존 12px 설정을 유지하며 간격만 조절 */
 #lumos-injected-modal .lumos-body {
-    display: block !important;
-    font-size: 12px !important;
-    line-height: 1.6 !important;
-    margin-bottom: 4px !important;
-    color: #383838 !important;
+  display: block !important;
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+  margin-bottom: 4px !important;
+  color: #383838 !important;
 }
 
 /* 첫 번째 요소가 제목일 경우 상단 여백 제거 */
 #lumos-injected-modal .lumos-modal-content-container div:first-child {
-    margin-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 /* 스크롤 */
 .lumos-modal-content-container::-webkit-scrollbar {
-    width: 25px; 
+  width: 25px;
 }
 
 .lumos-modal-content-container::-webkit-scrollbar-thumb {
-    background-color: white;
-    background-clip: padding-box; 
-    
-    border: 8px solid transparent; 
-    
-    border-radius: 20px;
-    box-shadow: inset 0 0 0 1px var(--font2-color); 
+  background-color: white;
+  background-clip: padding-box;
+
+  border: 8px solid transparent;
+
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px var(--font2-color);
 }
 
 .lumos-modal-content-container::-webkit-scrollbar-track {
-    background: transparent; 
+  background: transparent;
 }
 
 /* 체크박스 */
 .lumos-modal-checkbox input {
-    display: none;
+  display: none;
 }
 
 .lumos-modal-checkbox {
-    width: 113px;
-    height: 24px;
+  width: 113px;
+  height: 24px;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .lumos-checkbox-mark {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 
-    border: 2px solid var(--main-color);
-    border-radius: 4px;
+  border: 2px solid var(--main-color);
+  border-radius: 4px;
 }
 
 .lumos-checkbox-mark::after {
-    content: "";
-    position: absolute;
-    
-    width: 8px;
-    height: 8px;
+  content: "";
+  position: absolute;
 
-    display: none;
-    top: 50%;
-    left: 50%;
+  width: 8px;
+  height: 8px;
 
-    background-color: var(--main-color);
-    border-radius: 2px;
-    transform: translate(-50%, -50%);
+  display: none;
+  top: 50%;
+  left: 50%;
+
+  background-color: var(--main-color);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
 }
 
 .lumos-modal-checkbox input:checked + .lumos-checkbox-mark::after {
-    display: block; 
+  display: block;
 }
 
 .lumos-modal-checkbox input:checked + .lumos-checkbox-mark {
-    border-color: var(--main-color);
+  border-color: var(--main-color);
 }
 
 .lumos-checkbox-text {
-    font-size: 20px;
-    color: var(--font1-color);
+  font-size: 20px;
+  color: var(--font1-color);
 }
 
 /* 모달 숨기기용 클래스 */
 .lumos-hidden {
-    display: none !important;
+  display: none !important;
 }
