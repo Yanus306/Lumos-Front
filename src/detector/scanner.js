@@ -1,6 +1,11 @@
-const startAnalysis = async () => { 
-    if (document.querySelector('.lumos-ai-highlight')) return;
+let scrollTimeout;
+let isAnalyzing = false; // 중복 분석 방지 플래그
 
+const startAnalysis = async () => { 
+    // 분석 중이면 중단 (스크롤 시 여러 번 호출되는 것 방지)
+    if (isAnalyzing) return;
+    
+    isAnalyzing = true;
     console.log("🎯 [Lumos] 분석 및 하이라이트 생성");
 
     // =========================================================
@@ -35,6 +40,7 @@ const startAnalysis = async () => {
 
         if (!Array.isArray(data) || data.length === 0) {
             console.log("✅ [Lumos] 검출된 다크 패턴이 없습니다.");
+            isAnalyzing = false; // 분석 완료 처리
             return;
         }
 
@@ -62,6 +68,8 @@ const startAnalysis = async () => {
         }
     } catch (error) {
         console.error("❌ [Lumos] API 분석 실패:", error);
+    } finally {
+        isAnalyzing = false; // 성공하든 실패하든 플래그 해제
     }
 };
 
@@ -120,5 +128,22 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
-// 3. 페이지 로드 시 초기 상태 확인
+// 3. 스크롤 감지 리스너
+const handleScroll = () => {
+    // 사용자가 스크롤을 멈추고 500ms 후에 실행 (디바운싱)
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
+            // 활성화 상태이고, 모달이 없으며, 현재 분석 중이 아닐 때만 실행
+            const isModalPresent = document.querySelector('#lumos-injected-modal');
+            if (result.lumosDetectEnabled === true && !isModalPresent && !isAnalyzing) {
+                console.log("📜 [Lumos] 새로운 영역 감지 - 분석 시작");
+                startAnalysis();
+            }
+        });
+    }, 500); 
+};
+
+// 초기 실행 및 리스너 등록
 syncState();
+window.addEventListener('scroll', handleScroll);
