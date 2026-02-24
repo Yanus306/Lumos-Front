@@ -1,28 +1,63 @@
-/* 전역 설정(root)이나 전체 선택자(*)는 절대 사용 금지! */
-/* 대신 모달의 ID 내부로 한정합니다 */
-
-#lumos-injected-modal {
-  --main-color: #01123d;
-  --font1-color: #383838;
-  --font2-color: #919191;
-  --bg-color: #ffffff;
-
-  /* 폰트 설정을 모달 내부로만 한정 */
-  font-family:
-    "Pretendard",
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    Roboto,
-    sans-serif;
-  line-height: 1.5;
+/* 폰트 설정 (Pretendard) */
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
+    font-weight: 900; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');
+    font-weight: 800; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
+    font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
+    font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
+    font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
+    font-weight: 200; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
+    font-weight: 100; font-style: normal; font-display: swap;
 }
 
-/* 모든 요소(*) 대신 모달 내부의 요소만 초기화 */
-#lumos-injected-modal * {
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
+/* 전역 변수 설정 */
+#lumos-injected-modal, :root {
+    --main-color: #01123D;
+    --font1-color: #383838;
+    --font2-color: #919191;
+    --bg-color: #ffffff;
+    
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
+}
+
+/* 기본 스타일 초기화 */
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
