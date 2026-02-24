@@ -6,19 +6,34 @@ const setupCheckboxLogic = (container) => {
     const modalOverlay = container.querySelector('.lumos-modal-overlay');
 
     const handleCheck = () => {
+        const checkboxes = container.querySelectorAll('.lumos-check');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         
         if (allChecked) {
-            console.log("✅ 모든 약관 동의 완료 - 스토리지 직접 업데이트");
-            
+            // 1. 알림창 표시
+            alert("✅ 동의가 완료되었습니다!\n확인 버튼을 누르면 분석이 시작됩니다.");
+
+            // 2. 모달 제거
+            const modalElement = document.querySelector('#lumos-injected-modal');
+            if (modalElement) {
+                modalElement.remove();
+                console.log("🗑️ 모달 제거 완료");
+            }
+
+            // 3. 스토리지 저장 후 실행
             chrome.storage.local.set({ lumosDetectEnabled: true }, () => {
-                setTimeout(() => {
-                    if (modalOverlay) {
-                        modalOverlay.classList.add('lumos-hidden');
-                    }
-                    chrome.runtime.sendMessage({ action: "MODAL_COMPLETE" });
-                    alert("✅ 동의가 완료되었습니다!\n확장 프로그램 팝업을 다시 열어 분석 결과를 확인해주세요.");
-                }, 300);
+                console.log("📸 [Lumos] 스토리지 업데이트 완료");
+
+                // 메시지도 보내고, 직접 함수 실행도 시도합니다 (가장 확실한 방법)
+                if (typeof startAnalysis === 'function') {
+                    console.log("🎯 [Lumos] 직접 startAnalysis 실행");
+                    setTimeout(startAnalysis, 500); 
+                } else {
+                    console.log("📨 [Lumos] 메시지 방식으로 스캔 요청");
+                    setTimeout(() => {
+                        chrome.runtime.sendMessage({ action: "START_SCAN" });
+                    }, 500);
+                }
             });
         }
     };

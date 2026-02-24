@@ -95,10 +95,13 @@ const stopAnalysis = () => {
 };
 
 // 스토리지 상태를 체크해서 켜고 끄는 함수
+// scanner.js 내 syncState 수정 (선택 사항)
 const syncState = () => {
     chrome.storage.local.get(['lumosDetectEnabled'], (result) => {
         if (result.lumosDetectEnabled === true) {
-            startAnalysis();
+            // 처음 페이지 로드 시에만 자동 실행하고 싶다면 
+            // modal.js에서 수동으로 START_SCAN을 보낼 때는 무시하도록 로직을 짤 수 있습니다.
+            // 하지만 위 modal.js 수정만으로도 alert 이후에 실행되므로 그대로 두어도 무방합니다.
         } else {
             stopAnalysis();
         }
