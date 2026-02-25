@@ -87,10 +87,16 @@ const startAnalysis = async () => {
             };
         });
 
-        console.table(highlights); 
+        console.table(highlights);
 
+        let notRemovedElements;
+        if(window.removeElement) {
+            notRemovedElements = window.removeElement(highlights);
+        } else {
+            notRemovedElements = highlights;
+        }
         if (window.applyAiHighlight) {
-            window.applyAiHighlight(highlights);
+            window.applyAiHighlight(notRemovedElements);
         }
 
         // 3. 분석 성공 후 위치 기록 업데이트
@@ -102,16 +108,6 @@ const startAnalysis = async () => {
         isAnalyzing = false; 
     }
 };
-
-const base64ToBlob = (base64) => {
-    const byteString = atob(base64.split(',')[1]);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: 'image/jpeg' });
-}
 
 // 하이라이트 제거 함수
 const stopAnalysis = () => {

@@ -17,7 +17,7 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "detector/config.js",
+        "detector/remover.js",
         "detector/capture.js", 
         "detector/overlay.js",
         "detector/scanner.js",

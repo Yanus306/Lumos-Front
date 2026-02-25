@@ -18,12 +18,12 @@ export default defineConfig({
         policy: resolve(__dirname, "src/policy/policy.html"),
         overlay: resolve(__dirname, "src/detector/overlay.js"),
         scanner: resolve(__dirname, "src/detector/scanner.js"),
-        config: resolve(__dirname, "src/detector/config.js"),
+        remover: resolve(__dirname, "src/detector/remover.js"),
         capture: resolve(__dirname, "src/detector/capture.js"),
       },
       output: {
       entryFileNames: (chunkInfo) => {
-          const detectorFiles = ["overlay", "scanner", "config", "capture"];
+          const detectorFiles = ["overlay", "scanner", "remover", "capture"];
           if (detectorFiles.includes(chunkInfo.name)) {
             return "detector/[name].js";
           }
