@@ -41,10 +41,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 에러 방지를 위해 fetchAndShowRisk 함수도 확실히 정의
   function fetchAndShowRisk() {
-    // 임시 데이터 사용
-    const mockBackendData = { score: 85, status: "고위험" };
-    console.log("📊 UI 업데이트 데이터:", mockBackendData);
-    updateDonutGauge(mockBackendData.score, mockBackendData.status);
+    chrome.storage.local.get(["lastRiskData"], (result) => {
+      const data = result.lastRiskData || { score: 0, status: "데이터 없음", level: "low" };
+      updateDonutGauge(data.score, data.status, data.level);
+    });
+  }
+
+  function updateDonutGauge(score, status, level) {
+    const meters = {
+      low: document.getElementById("meter-low"),
+      mid: document.getElementById("meter-mid"),
+      high: document.getElementById("meter-high"),
+    };
+
+    // 1. 초기화
+    Object.values(meters).forEach(m => m?.classList.remove("active"));
+
+    // 2. 전달받은 level("low", "mid", "high")에 따라 활성화
+    if (meters[level]) {
+      meters[level].classList.add("active");
+    }
+    
+    applyLabelStyles(level);
   }
 
   function applyLabelStyles(activeLevel) {

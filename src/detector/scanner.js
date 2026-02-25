@@ -30,14 +30,47 @@ const startAnalysis = async () => {
             body: imageBlob
         });
         
-        const data = await response.json(); 
+        const data = await response.json();
         console.log("📦 [Lumos] 서버 응답 원본:", data);
 
         if (!Array.isArray(data) || data.length === 0) {
-            console.log("✅ [Lumos] 검출된 다크 패턴이 없습니다.");
-            lastAnalyzedY = currentY; // 결과가 없어도 이 위치는 확인한 것으로 기록
+            chrome.storage.local.set({ lastRiskData: { score: 0, status: "안전", level: "low" } });
             return;
         }
+
+        const totalCount = data.length; // 탐지된 다크패턴 개수
+        const hasHighRiskClass = data.some(item => item.patternType === "2" || item.patternType === "3");
+
+        let finalStatus = "안전";
+        let finalLevel = "low";
+        let displayScore = 10; // 기본 안전 점수
+
+        if (totalCount >= 5 || hasHighRiskClass) {
+            // 대(High): 5개 이상이거나 고위험 클래스 포함
+            finalStatus = "위험";
+            finalLevel = "high";
+            displayScore = 90; 
+        } else if (totalCount >= 2 && totalCount <= 4) {
+            // 중(Medium): 2~4개이며 고위험 클래스 없음
+            finalStatus = "주의";
+            finalLevel = "mid";
+            displayScore = 50;
+        } else {
+            // 소(Low): 0~1개
+            finalStatus = "안전";
+            finalLevel = "low";
+            displayScore = 10;
+        }
+
+        // 스토리지에 저장
+        chrome.storage.local.set({ 
+            lastRiskData: { 
+                score: displayScore, 
+                status: finalStatus, 
+                level: finalLevel,
+                count: totalCount 
+            } 
+        });
 
         const highlights = data.map(item => {
             const x = Number(item.rect[0]) + window.scrollX;
