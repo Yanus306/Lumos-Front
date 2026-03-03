@@ -21,6 +21,7 @@ const startAnalysis = async () => {
 
     try {
         console.log("📸 [Lumos] 화면 캡쳐 요청 중...");
+        const currentX = window.scrollX;
         const imageBlob = await window.lumosCapture.takeScreenshot();
 
         console.log("🚀 [Lumos] BE로 데이터 전송 중...");
@@ -73,8 +74,8 @@ const startAnalysis = async () => {
         });
 
         const highlights = data.map(item => {
-            const x = Number(item.rect[0]) + window.scrollX;
-            const y = Number(item.rect[1]) + window.scrollY;
+            const x = Number(item.rect[0]) + currentX;
+            const y = Number(item.rect[1]) + currentY;
             
             return {
                 x: x,
