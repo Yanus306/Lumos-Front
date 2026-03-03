@@ -39,7 +39,7 @@ window.removeElement = (predictions, positionSnapshot) => {
     });
 
     needRemoveElements.forEach(el => {
-        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
     });
 
     return notRemovedItems;
