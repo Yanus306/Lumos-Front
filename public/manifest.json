@@ -7,11 +7,7 @@
     "default_popup": "popup/popup.html"
   },
   "host_permissions": [
-    "https://lumos.jongyeol.kr/*", 
-    "https://*/*", 
-    "https://*.google.com/*",
-    "https://*.google.co.kr/*",
-    "https://*.gstatic.com/*"
+    "<all_urls>"
   ],
   "content_scripts": [
     {
