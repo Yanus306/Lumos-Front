@@ -22,6 +22,28 @@ const startAnalysis = async () => {
     try {
         console.log("📸 [Lumos] 화면 캡쳐 요청 중...");
         const currentX = window.scrollX;
+
+        // Caching element positions
+        const positionSnapshot = new Map();
+
+        document.querySelectorAll('body *:not(script):not(style):not(link)').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if(rect.width === 0 || rect.height === 0) return;
+
+            // Visible check
+            if(rect.top >= window.innerHeight ||
+                rect.bottom <= 0 ||
+                rect.left >= window.innerWidth ||
+                rect.right <= 0) return;
+
+            positionSnapshot.set(el, {
+                x: rect.left + currentX,
+                y: rect.top + currentY,
+                width: rect.width,
+                height: rect.height
+            });
+        });
+
         const imageBlob = await window.lumosCapture.takeScreenshot();
 
         console.log("🚀 [Lumos] BE로 데이터 전송 중...");
@@ -92,7 +114,7 @@ const startAnalysis = async () => {
 
         let notRemovedElements;
         if(window.removeElement) {
-            notRemovedElements = window.removeElement(highlights);
+            notRemovedElements = window.removeElement(highlights, positionSnapshot);
         } else {
             notRemovedElements = highlights;
         }
