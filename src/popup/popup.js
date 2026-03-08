@@ -215,3 +215,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// --- [로직] 6. 표시/삭제 사각형 토글 기능---
+  const setupRectToggle = (containerId, storageKey, actionOn, actionOff) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.addEventListener("click", (e) => {
+      const target = e.target.closest("span");
+      if (!target || !target.dataset.value) return;
+
+      const value = target.dataset.value;
+      const isEnabled = (value === "on");
+
+      // 1. UI 업데이트 (active 클래스 교체)
+      container.querySelectorAll("span").forEach(s => s.classList.remove("active"));
+      target.classList.add("active");
+
+      // 2. 설정값을 브라우저 스토리지에 저장 (팝업을 닫았다 열어도 유지되게 함)
+      chrome.storage.local.set({ [storageKey]: isEnabled });
+
+      // 3. 현재 보고 있는 웹페이지(Content Script)로 명령 전송
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0] && tabs[0].id) {
+          chrome.tabs.sendMessage(tabs[0].id, { 
+            action: isEnabled ? actionOn : actionOff 
+          }, (response) => {
+            if (chrome.runtime.lastError) {
+              console.log("ℹ️ 이 페이지에서는 기능을 실행할 수 없습니다.");
+            }
+          });
+        }
+      });
+    });
+  };
+
+  // 기능 연결 (HTML의 id와 스토리지 키, 보낼 명령어를 매칭합니다)
+  setupRectToggle("toggle-display", "displayEnabled", "SHOW_HIGHLIGHT", "HIDE_HIGHLIGHT");
+  setupRectToggle("toggle-remove", "removeEnabled", "START_REMOVAL", "STOP_REMOVAL");

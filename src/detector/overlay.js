@@ -42,3 +42,23 @@ function clearAiHighlight() {
 
 window.applyAiHighlight = applyAiHighlight;
 window.clearAiHighlight = clearAiHighlight;
+
+// 팝업(popup.js)에서 보낸 메시지를 수신하는 리스너
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "SHOW_HIGHLIGHT") {
+        console.log("🎨 [Lumos] 하이라이트 표시 명령 수신");
+        
+        // 스토리지에 저장된 마지막 분석 데이터를 가져와서 다시 그립니다.
+        chrome.storage.local.get(["lastRiskData"], (result) => {
+            if (result.lastRiskData && result.lastRiskData.predictions) {
+                applyAiHighlight(result.lastRiskData.predictions);
+            } else {
+                console.log("ℹ️ 표시할 분석 데이터가 없습니다.");
+            }
+        });
+    } 
+    else if (request.action === "HIDE_HIGHLIGHT") {
+        console.log("🚫 [Lumos] 하이라이트 제거 명령 수신");
+        clearAiHighlight();
+    }
+});

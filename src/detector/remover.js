@@ -1,4 +1,5 @@
 window.removeElement = (predictions, positionSnapshot) => {
+    
     let notRemovedItems = [];
     const THRESHOLD = 50; // 정확도 보고 조정
     let needRemoveElements = [];
@@ -44,3 +45,15 @@ window.removeElement = (predictions, positionSnapshot) => {
 
     return notRemovedItems;
 };
+//팝업에서 보낸 메시지를 수신하는 리스너
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "START_REMOVAL") {
+        chrome.storage.local.get(["lastRiskData"], (result) => {
+            if (result.lastRiskData?.predictions && window.positionSnapshot) {
+                removeElement(result.lastRiskData.predictions, window.positionSnapshot);
+            }
+        });
+    } else if (request.action === "STOP_REMOVAL") {
+        location.reload();
+    }
+});

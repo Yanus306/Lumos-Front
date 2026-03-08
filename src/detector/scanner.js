@@ -24,7 +24,7 @@ const startAnalysis = async () => {
         const currentX = window.scrollX;
 
         // Caching element positions
-        const positionSnapshot = new Map();
+        window.positionSnapshot = new Map();
 
         document.querySelectorAll('body *:not(script):not(style):not(link)').forEach(el => {
             const rect = el.getBoundingClientRect();
