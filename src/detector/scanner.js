@@ -1,4 +1,20 @@
-let scrollTimeout;
+const style = document.createElement('style');
+style.textContent = `
+    /* 표시(하이라이트) OFF 상태일 때 */
+    body.lumos-display-off .lumos-ai-highlight {
+        display: none !important;
+    }
+    /* 삭제 OFF 상태일 때 (숨겨진 요소 다시 보이기) */
+    body.lumos-remove-off .lumos-hidden-element {
+        visibility: visible !important;
+    }
+    /* 삭제 ON 상태일 때 기본 숨김 */
+    .lumos-hidden-element {
+        visibility: hidden !important;
+    }
+`;
+document.head.appendChild(style);let scrollTimeout;
+
 let isAnalyzing = false; // 중복 분석 방지 플래그
 let lastAnalyzedY = -9999; // 마지막으로 분석한 위치 저장
 
@@ -53,7 +69,16 @@ const startAnalysis = async () => {
             body: imageBlob
         });
         
-        const data = await response.json();
+        const rawText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch (e) {
+            console.error("❌ [Lumos] JSON 파싱 에러:", rawText);
+            isAnalyzing = false;
+            return;
+        }
+
         console.log("📦 [Lumos] 서버 응답 원본:", data);
 
         if (!Array.isArray(data) || data.length === 0) {
@@ -72,7 +97,7 @@ const startAnalysis = async () => {
         const totalCount = data.length; // 탐지된 다크패턴 개수
         const hasHighRiskClass = data.some(item => item.patternType === "2" || item.patternType === "3");
 
-        let finalStatus = "안전";
+        let finalStatus = "안전"; // ?
         let finalLevel = "low";
         let displayScore = 10; // 기본 안전 점수
 
@@ -129,6 +154,12 @@ const startAnalysis = async () => {
         if (window.applyAiHighlight) {
             window.applyAiHighlight(notRemovedElements);
         }
+
+        // 초기 클래스 상태 반영
+        chrome.storage.local.get(['displayEnabled', 'removeEnabled'], (res) => {
+            if (res.displayEnabled === false) document.body.classList.add('lumos-display-off');
+            if (res.removeEnabled === false) document.body.classList.add('lumos-remove-off');
+        });
 
         // 3. 분석 성공 후 위치 기록 업데이트
         lastAnalyzedY = currentY;

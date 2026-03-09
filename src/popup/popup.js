@@ -250,6 +250,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  chrome.storage.local.get(['displayEnabled', 'removeEnabled'], (res) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+            // 팝업 열릴 때 현재 설정에 맞춰 페이지 클래스 초기화 명령 전송
+            if (res.displayEnabled === false) chrome.tabs.sendMessage(tabs[0].id, { action: "HIDE_HIGHLIGHT" });
+            if (res.removeEnabled === false) chrome.tabs.sendMessage(tabs[0].id, { action: "STOP_REMOVAL" });
+        }
+    });
+});
+
   // 기능 연결 (HTML의 id와 스토리지 키, 보낼 명령어를 매칭합니다)
   setupRectToggle("toggle-display", "displayEnabled", "SHOW_HIGHLIGHT", "HIDE_HIGHLIGHT");
   setupRectToggle("toggle-remove", "removeEnabled", "START_REMOVAL", "STOP_REMOVAL");
