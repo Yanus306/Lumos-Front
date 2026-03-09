@@ -57,7 +57,15 @@ const startAnalysis = async () => {
         console.log("📦 [Lumos] 서버 응답 원본:", data);
 
         if (!Array.isArray(data) || data.length === 0) {
-            chrome.storage.local.set({ lastRiskData: { score: 0, status: "안전", level: "low" } });
+            chrome.storage.local.set({ 
+                lastRiskData: { 
+                    score: displayScore, 
+                    status: finalStatus, 
+                    level: finalLevel,
+                    count: totalCount,
+                    predictions: highlights
+                } 
+            });
             return;
         }
 
