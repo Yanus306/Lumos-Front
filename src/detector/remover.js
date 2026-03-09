@@ -1,3 +1,5 @@
+let hiddenElements = [];
+
 window.removeElement = (predictions, positionSnapshot) => {
     
     let notRemovedItems = [];
@@ -31,8 +33,10 @@ window.removeElement = (predictions, positionSnapshot) => {
             }
         });
         if(minScore <= THRESHOLD) {
-            needRemoveElements.push(...closestElements);
-            console.log('Target found. Score:', minScore, "Element:", closestElements);
+            closestElements.forEach(el => {
+                el.style.setProperty('visibility', 'hidden', 'important');
+                hiddenElements.push(el); 
+            });
         } else {
             console.log('No matching element found for prediction. Minimum score:', minScore, ", Prediction:", item);
             notRemovedItems.push(item);
@@ -54,6 +58,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
         });
     } else if (request.action === "STOP_REMOVAL") {
-        location.reload();
+        console.log("🔓 [Lumos] 숨겨진 요소 다시 표시");
+        hiddenElements.forEach(el => {
+            el.style.removeProperty('visibility');
+        });
+        hiddenElements = [];
     }
 });
