@@ -42,3 +42,18 @@ function clearAiHighlight() {
 
 window.applyAiHighlight = applyAiHighlight;
 window.clearAiHighlight = clearAiHighlight;
+
+// 팝업(popup.js)에서 보낸 메시지를 수신하는 리스너
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "SHOW_HIGHLIGHT") {
+        document.body.classList.remove('lumos-display-off');
+        // 혹시 데이터가 유실되었을 경우를 위해 다시 그리기 시도 (선택 사항)
+        chrome.storage.local.get(["lastRiskData"], (result) => {
+            if (result.lastRiskData?.predictions) window.applyAiHighlight(result.lastRiskData.predictions);
+        });
+    } 
+    else if (request.action === "HIDE_HIGHLIGHT") {
+        document.body.classList.add('lumos-display-off');
+    }
+    sendResponse({ status: "done" });
+});

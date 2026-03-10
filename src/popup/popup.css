@@ -147,7 +147,7 @@ body {
 .logo-mini {
   position: absolute;
   left: 36px;
-  top: 59px;
+  top: 39px;
   width: 40px;
   height: 43px;
   object-fit: contain;
@@ -156,7 +156,7 @@ body {
 .top-header .toggle-btn.mini {
   position: absolute;
   left: 245px;
-  top: 59px;
+  top: 41px;
   width: 70px;
   height: 27px;
 }
@@ -172,7 +172,7 @@ body {
 .slider-on:before {
   content: "";
   position: absolute;
-  left: 5px;
+  left: 4px;
   top: 3.5px;
   width: 20px;
   height: 20px;
@@ -183,25 +183,25 @@ body {
 
 .top-header .label-text {
   position: absolute;
-  left: 18px; 
+  left: 12px; 
   top: 50%;
   transform: translateY(-50%);
   color: #ffffff !important;
-  font-size: 12px;
+  font-size: 11px;
   z-index: 1;
 }
 
 #to-off-btn:checked + .slider-on:before {
-  transform: translateX(40px);
+  transform: translateX(42px);
 }
 
 .title-mini {
   position: absolute;
-  top: 105px;
+  top: 96px;
   width: 100%;
   text-align: center;
   font-size: 32px;
-  font-weight: 680;
+  font-weight: 550;
   color: #383838;
 }
 
@@ -209,8 +209,8 @@ body {
 .chart-container {
   position: absolute;
   left: 50%;
-  top: 265px; 
-  transform: translate(-50%, -50%); 
+  top: 144px; 
+  transform: translateX(-50%); 
   width: 195.5px; 
   height: 230.37px;
   display: flex;
@@ -289,10 +289,10 @@ body {
 .risk-title {
   position: absolute;
   left: 50%; 
-  top: 385px; 
+  top: 243px; 
   transform: translateX(-50%);
-  font-size: 24px;   
-  font-weight: 700;  
+  font-size: 20px;   
+  font-weight: 590;  
   color: #383838;  
   text-align: center;
 }
@@ -303,7 +303,7 @@ input[type="checkbox"] {
 
 .policy-container {
   position: absolute;
-  bottom: 50px; 
+  bottom: 41px; 
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -319,4 +319,69 @@ input[type="checkbox"] {
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s, color 0.2s;
+}
+
+/* --- 하단 표시/삭제 스위치 영역 --- */
+.control-panel {
+  position: absolute;
+  top: 368px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 24px; /* 스위치 사이 간격 */
+  z-index: 5;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.control-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #383838;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+/* 사각형 토글 스위치 디자인 */
+.rect-toggle {
+  display: flex;
+  width: 84px;
+  height: 34px;
+  background: #e2e2e2;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden;
+}
+
+.rect-toggle span {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #01123d;
+  letter-spacing: -0.02em;
+  transition: all 0.2s;
+  height: 100%;
+}
+
+/* 활성화 상태 (진한 남색 배경) */
+.rect-toggle span.active {
+  background: #011139;
+  color: white;
+  border-radius: 2px;
+  font-weight: 350;
+}
+
+#toggle-display span:nth-child(2).active,
+#toggle-remove span:nth-child(2).active {
+  border-radius: 0 4px 4px 0;
 }
