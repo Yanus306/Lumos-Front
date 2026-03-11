@@ -13,8 +13,9 @@ style.textContent = `
         visibility: hidden !important;
     }
 `;
-document.head.appendChild(style);let scrollTimeout;
+document.head.appendChild(style);
 
+let scrollTimeout;
 let isAnalyzing = false; // 중복 분석 방지 플래그
 let lastAnalyzedY = -9999; // 마지막으로 분석한 위치 저장
 
@@ -69,66 +70,48 @@ const startAnalysis = async () => {
             body: imageBlob
         });
         
+        // JSON 에러 방지: 텍스트로 먼저 받고 검사
         const rawText = await response.text();
-        let data;
+        let responseData;
         try {
-            data = JSON.parse(rawText);
+            responseData = JSON.parse(rawText);
         } catch (e) {
             console.error("❌ [Lumos] JSON 파싱 에러:", rawText);
             isAnalyzing = false;
             return;
         }
 
-        console.log("📦 [Lumos] 서버 응답 원본:", data);
+        console.log("📦 [Lumos] 서버 응답 원본:", responseData);
 
-        if (!Array.isArray(data) || data.length === 0) {
-            chrome.storage.local.set({ 
-                lastRiskData: { 
-                    score: displayScore, 
-                    status: finalStatus, 
-                    level: finalLevel,
-                    count: totalCount,
-                    predictions: highlights
-                } 
-            });
-            return;
-        }
+        // BE 데이터 추출
+        const { riskLevel, results } = responseData; 
+        const totalCount = results ? results.length : 0;
 
-        const totalCount = data.length; // 탐지된 다크패턴 개수
-        const hasHighRiskClass = data.some(item => item.patternType === "2" || item.patternType === "3");
-
-        let finalStatus = "안전"; // ?
+        // 위험도 기본값 설정
+        let finalStatus = "안전";
         let finalLevel = "low";
-        let displayScore = 10; // 기본 안전 점수
+        let displayScore = 10;
 
-        if (totalCount >= 5 || hasHighRiskClass) {
-            // 대(High): 5개 이상이거나 고위험 클래스 포함
+        // BE에서 넘겨준 riskLevel(0:안전, 1:주의, 2:위험)에 따라 분리
+        if (riskLevel === 2) {
+            // 고위험(High)
             finalStatus = "위험";
             finalLevel = "high";
             displayScore = 90; 
-        } else if (totalCount >= 2 && totalCount <= 4) {
-            // 중(Medium): 2~4개이며 고위험 클래스 없음
+        } else if (riskLevel === 1) {
+            // 중위험(Medium)
             finalStatus = "주의";
             finalLevel = "mid";
             displayScore = 50;
         } else {
-            // 소(Low): 0~1개
+            // 저위험(Low)
             finalStatus = "안전";
             finalLevel = "low";
             displayScore = 10;
         }
 
-        // 스토리지에 저장
-        chrome.storage.local.set({ 
-            lastRiskData: { 
-                score: displayScore, 
-                status: finalStatus, 
-                level: finalLevel,
-                count: totalCount 
-            } 
-        });
-
-        const highlights = data.map(item => {
+        // 하이라이트 데이터 생성
+        const highlights = results.map(item => {
             const x = Number(item.rect[0]) + currentX;
             const y = Number(item.rect[1]) + currentY;
             
@@ -138,9 +121,19 @@ const startAnalysis = async () => {
                 width: Number(item.rect[2]),
                 height: Number(item.rect[3]),
                 type: item.patternType, 
-                riskLevel: item.risk.level,
-                score: item.risk.score 
+                confidence: item.yoloConfidence
             };
+        });
+
+        // 스토리지에 저장 (팝업 UI 업데이트용)
+        chrome.storage.local.set({ 
+            lastRiskData: { 
+                score: displayScore, 
+                status: finalStatus, 
+                level: finalLevel,
+                count: totalCount,
+                predictions: highlights
+            } 
         });
 
         console.table(highlights);

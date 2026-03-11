@@ -27,7 +27,7 @@
     font-size: 24px;
     background-color: white;
     border-radius: 10px;
-    border: 4px solid var(--main-color);
+    border: 4px solid #01123d;
     
     overflow-y: auto; 
 
@@ -62,7 +62,7 @@
     border: 8px solid transparent; 
     
     border-radius: 20px;
-    box-shadow: inset 0 0 0 1px var(--font2-color); 
+    box-shadow: inset 0 0 0 1px #919191; 
 }
 
 .policy-content-container::-webkit-scrollbar-track {
