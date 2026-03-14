@@ -20,10 +20,11 @@ export default defineConfig({
         scanner: resolve(__dirname, "src/detector/scanner.js"),
         remover: resolve(__dirname, "src/detector/remover.js"),
         capture: resolve(__dirname, "src/detector/capture.js"),
+        api: resolve(__dirname, "src/detector/api.js"),
       },
       output: {
       entryFileNames: (chunkInfo) => {
-          const detectorFiles = ["overlay", "scanner", "remover", "capture"];
+          const detectorFiles = ["overlay", "scanner", "remover", "capture", "api"];
           if (detectorFiles.includes(chunkInfo.name)) {
             return "detector/[name].js";
           }

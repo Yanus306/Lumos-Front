@@ -13,9 +13,10 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "detector/remover.js",
+        "detector/api.js",
         "detector/capture.js", 
         "detector/overlay.js",
+        "detector/remover.js",
         "detector/scanner.js",
         "modal/modal.js"
       ], 
